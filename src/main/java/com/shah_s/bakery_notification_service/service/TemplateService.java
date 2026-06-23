@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import com.shah_s.bakery_notification_service.exception.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
@@ -50,7 +51,7 @@ public class TemplateService {
         try {
             // Validate template name uniqueness
             if (templateRepository.findByName(request.getName()).isPresent()) {
-                throw new NotificationServiceException("Template with name already exists: " + request.getName());
+                throw new DuplicateTemplateException("Template with name already exists: " + request.getName());
             }
 
             // Extract variables from templates
@@ -101,7 +102,7 @@ public class TemplateService {
             // Validate name uniqueness (excluding current template)
             if (!template.getName().equals(request.getName()) &&
                 templateRepository.existsByNameAndNotId(request.getName(), templateId)) {
-                throw new NotificationServiceException("Template with name already exists: " + request.getName());
+                throw new DuplicateTemplateException("Template with name already exists: " + request.getName());
             }
 
             // Extract variables from updated templates
@@ -255,7 +256,7 @@ public class TemplateService {
 
         int updated = templateRepository.activateTemplate(templateId);
         if (updated == 0) {
-            throw new NotificationServiceException("Template not found: " + templateId);
+            throw new TemplateNotFoundException("Template not found: " + templateId);
         }
 
         logger.info("Template activated successfully: {}", templateId);
@@ -268,7 +269,7 @@ public class TemplateService {
 
         int updated = templateRepository.deactivateTemplate(templateId);
         if (updated == 0) {
-            throw new NotificationServiceException("Template not found: " + templateId);
+            throw new TemplateNotFoundException("Template not found: " + templateId);
         }
 
         logger.info("Template deactivated successfully: {}", templateId);

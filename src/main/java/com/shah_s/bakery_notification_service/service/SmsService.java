@@ -2,9 +2,9 @@ package com.shah_s.bakery_notification_service.service;
 
 import com.shah_s.bakery_notification_service.entity.Notification;
 import com.shah_s.bakery_notification_service.exception.NotificationServiceException;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
+// import com.twilio.Twilio;
+// import com.twilio.rest.api.v2010.account.Message;
+// import com.twilio.type.PhoneNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,8 +40,9 @@ public class SmsService {
     public void initializeTwilio() {
         if (smsEnabled && accountSid != null && authToken != null) {
             try {
-                Twilio.init(accountSid, authToken);
-                logger.info("Twilio SMS service initialized successfully");
+                // TODO in production: uncomment to init twilio
+                // Twilio.init(accountSid, authToken);
+                logger.info("Twilio SMS service initialized successfully (mocked)");
             } catch (Exception e) {
                 logger.error("Failed to initialize Twilio SMS service: {}", e.getMessage());
                 smsEnabled = false;
@@ -63,14 +64,20 @@ public class SmsService {
                    notification.getId(), maskPhoneNumber(notification.getRecipientPhone()));
 
         try {
+            // TODO in production: uncomment below to send actual SMS
+            /*
             Message message = Message.creator(
                 new PhoneNumber(notification.getRecipientPhone()),
                 new PhoneNumber(fromNumber),
                 notification.getContent()
             ).create();
+            */
+            String fakeSid = "SM" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 32);
+            logger.info("\n========== SMS NOTIFICATION ==========\nTo: {}\nMessage: {}\n======================================\n", 
+                        maskPhoneNumber(notification.getRecipientPhone()), notification.getContent());
 
-            notification.markAsSent(message.getSid());
-            logger.info("SMS sent successfully: id={}, sid={}", notification.getId(), message.getSid());
+            notification.markAsSent(fakeSid);
+            logger.info("SMS sent successfully: id={}, sid={}", notification.getId(), fakeSid);
 
         } catch (Exception e) {
             logger.error("Failed to send SMS notification {}: {}", notification.getId(), e.getMessage());
@@ -87,14 +94,20 @@ public class SmsService {
         logger.info("Sending SMS: to={}", maskPhoneNumber(toNumber));
 
         try {
+            // TODO in production: uncomment below to send actual SMS
+            /*
             Message message = Message.creator(
                 new PhoneNumber(toNumber),
                 new PhoneNumber(fromNumber),
                 messageBody
             ).create();
+            */
+            String fakeSid = "SM" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 32);
+            logger.info("\n========== SMS NOTIFICATION ==========\nTo: {}\nMessage: {}\n======================================\n", 
+                        maskPhoneNumber(toNumber), messageBody);
 
-            logger.info("SMS sent successfully: to={}, sid={}", maskPhoneNumber(toNumber), message.getSid());
-            return message.getSid();
+            logger.info("SMS sent successfully: to={}, sid={}", maskPhoneNumber(toNumber), fakeSid);
+            return fakeSid;
 
         } catch (Exception e) {
             logger.error("Failed to send SMS to {}: {}", maskPhoneNumber(toNumber), e.getMessage());

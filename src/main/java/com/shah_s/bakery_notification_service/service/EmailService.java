@@ -2,16 +2,16 @@ package com.shah_s.bakery_notification_service.service;
 
 import com.shah_s.bakery_notification_service.entity.Notification;
 import com.shah_s.bakery_notification_service.exception.NotificationServiceException;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+// import jakarta.mail.MessagingException;
+// import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+// import org.springframework.mail.MailException;
+// import org.springframework.mail.SimpleMailMessage;
+// import org.springframework.mail.javamail.JavaMailSender;
+// import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,8 @@ public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    @Autowired
-    private JavaMailSender mailSender;
+    // @Autowired
+    // private JavaMailSender mailSender;
 
     @Autowired
     private SpringTemplateEngine templateEngine;
@@ -78,6 +78,8 @@ public class EmailService {
     // Send simple text email
     private void sendTextEmail(Notification notification) {
         try {
+            // TODO in production: uncomment below to send actual email
+            /*
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(notification.getRecipientEmail());
@@ -86,8 +88,11 @@ public class EmailService {
             message.setReplyTo(replyToEmail);
 
             mailSender.send(message);
+            */
+            logger.info("\n========== EMAIL NOTIFICATION ==========\nTo: {}\nSubject: {}\nContent: {}\n========================================\n", 
+                        notification.getRecipientEmail(), notification.getSubject(), notification.getContent());
 
-        } catch (MailException e) {
+        } catch (Exception e) {
             logger.error("Failed to send text email: {}", e.getMessage());
             throw new NotificationServiceException("Failed to send text email: " + e.getMessage());
         }
@@ -96,6 +101,8 @@ public class EmailService {
     // Send HTML email
     private void sendHtmlEmail(Notification notification) {
         try {
+            // TODO in production: uncomment below to send actual email
+            /*
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
@@ -107,12 +114,15 @@ public class EmailService {
 
             // Add recipient name if available
             if (notification.getRecipientName() != null) {
-                helper.setTo(notification.getRecipientEmail(), notification.getRecipientName());
+                helper.setTo(notification.getRecipientEmail());
             }
 
             mailSender.send(mimeMessage);
+            */
+            logger.info("\n========== HTML EMAIL NOTIFICATION ==========\nTo: {}\nSubject: {}\nContent: {}\n=============================================\n", 
+                        notification.getRecipientEmail(), notification.getSubject(), notification.getContent());
 
-        } catch (MessagingException | MailException e) {
+        } catch (Exception e) {
             logger.error("Failed to send HTML email: {}", e.getMessage());
             throw new NotificationServiceException("Failed to send HTML email: " + e.getMessage());
         }
@@ -130,16 +140,21 @@ public class EmailService {
             String htmlContent = templateEngine.process(templateName, context);
 
             // Create and send email
+            // TODO in production: uncomment below to send actual email
+            /*
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             helper.setFrom(fromEmail, fromName);
-            helper.setTo(to, toName);
+            helper.setTo(to);
             helper.setSubject(subject);
             helper.setText("", htmlContent);
             helper.setReplyTo(replyToEmail);
 
             mailSender.send(mimeMessage);
+            */
+            logger.info("\n========== TEMPLATED EMAIL NOTIFICATION ==========\nTo: {}\nSubject: {}\nTemplate: {}\n==================================================\n", 
+                        to, subject, templateName);
 
             logger.info("Templated email sent successfully: to={}, template={}", to, templateName);
 
@@ -231,6 +246,8 @@ public class EmailService {
     // Test email connectivity
     public boolean testEmailConnection() {
         try {
+            // TODO in production: uncomment below to send actual email
+            /*
             SimpleMailMessage testMessage = new SimpleMailMessage();
             testMessage.setFrom(fromEmail);
             testMessage.setTo(fromEmail); // Send to self
@@ -238,6 +255,10 @@ public class EmailService {
             testMessage.setText("This is a test email to verify email service connectivity.");
 
             mailSender.send(testMessage);
+            */
+            logger.info("\n========== TEST EMAIL ==========\nTo: {}\nSubject: {}\n================================\n", 
+                        fromEmail, "Email Service Test");
+
             logger.info("Email connectivity test successful");
             return true;
 
