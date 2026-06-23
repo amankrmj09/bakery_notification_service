@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.sns.SnsClient;
-import software.amazon.awssdk.services.sns.model.*;
+// import software.amazon.awssdk.services.sns.SnsClient;
+// import software.amazon.awssdk.services.sns.model.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,27 +17,29 @@ public class AwsSnsService {
 
     private static final Logger logger = LoggerFactory.getLogger(AwsSnsService.class);
 
-    @Autowired
-    private SnsClient snsClient;
+    // @Autowired
+    // private SnsClient snsClient;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${aws.sns.ios-platform-arn}")
-    private String iosPlatformArn;
+    // @Value("${aws.sns.ios-platform-arn}")
+    // private String iosPlatformArn;
 
-    @Value("${aws.sns.android-platform-arn}")
-    private String androidPlatformArn;
+    // @Value("${aws.sns.android-platform-arn}")
+    // private String androidPlatformArn;
 
-    @Value("${aws.sns.general-topic-arn}")
-    private String generalTopicArn;
+    // @Value("${aws.sns.general-topic-arn}")
+    // private String generalTopicArn;
 
-    @Value("${notification.push.time-to-live:3600}")
-    private Integer timeToLive;
+    // @Value("${notification.push.time-to-live:3600}")
+    // private Integer timeToLive;
 
     // Create platform endpoint (register device token)
     public String createPlatformEndpoint(String deviceToken, String platform, String userId) {
         try {
+            // TODO in production: uncomment below to actually register
+            /*
             String platformArn = platform.equalsIgnoreCase("ios") ? iosPlatformArn : androidPlatformArn;
 
             CreatePlatformEndpointRequest request = CreatePlatformEndpointRequest.builder()
@@ -48,6 +50,8 @@ public class AwsSnsService {
 
             CreatePlatformEndpointResponse response = snsClient.createPlatformEndpoint(request);
             String endpointArn = response.endpointArn();
+            */
+            String endpointArn = "arn:aws:sns:mock:endpoint:" + java.util.UUID.randomUUID();
 
             logger.info("Created SNS endpoint for user {}: {}", userId, endpointArn);
             return endpointArn;
@@ -86,6 +90,8 @@ public class AwsSnsService {
             // Default message (fallback)
             messageMap.put("default", body);
 
+            // TODO in production: uncomment below to actually publish
+            /*
             PublishRequest request = PublishRequest.builder()
                     .targetArn(endpointArn)
                     .messageStructure("json")
@@ -93,7 +99,13 @@ public class AwsSnsService {
                     .build();
 
             PublishResponse response = snsClient.publish(request);
-            logger.info("Push notification sent successfully. MessageId: {}", response.messageId());
+            String messageId = response.messageId();
+            */
+            String messageId = java.util.UUID.randomUUID().toString();
+            logger.info("\n========== PUSH NOTIFICATION ==========\nTarget: {}\nTitle: {}\nBody: {}\n=======================================\n", 
+                        endpointArn, title, body);
+
+            logger.info("Push notification sent successfully. MessageId: {}", messageId);
 
         } catch (Exception e) {
             logger.error("Failed to send push notification to endpoint {}: {}", endpointArn, e.getMessage());
@@ -128,6 +140,8 @@ public class AwsSnsService {
             // Default message
             messageMap.put("default", body);
 
+            // TODO in production: uncomment below to actually publish
+            /*
             PublishRequest request = PublishRequest.builder()
                     .topicArn(topicArn)
                     .messageStructure("json")
@@ -136,7 +150,13 @@ public class AwsSnsService {
                     .build();
 
             PublishResponse response = snsClient.publish(request);
-            logger.info("Topic notification sent successfully. MessageId: {}", response.messageId());
+            String messageId = response.messageId();
+            */
+            String messageId = java.util.UUID.randomUUID().toString();
+            logger.info("\n========== TOPIC NOTIFICATION ==========\nTopic: {}\nTitle: {}\nBody: {}\n========================================\n", 
+                        topicArn, title, body);
+
+            logger.info("Topic notification sent successfully. MessageId: {}", messageId);
 
         } catch (Exception e) {
             logger.error("Failed to send topic notification to {}: {}", topicArn, e.getMessage());
@@ -147,6 +167,8 @@ public class AwsSnsService {
     // Subscribe user to topic
     public String subscribeToTopic(String topicArn, String endpointArn) {
         try {
+            // TODO in production: uncomment below to actually subscribe
+            /*
             SubscribeRequest request = SubscribeRequest.builder()
                     .topicArn(topicArn)
                     .protocol("application")
@@ -155,6 +177,8 @@ public class AwsSnsService {
 
             SubscribeResponse response = snsClient.subscribe(request);
             String subscriptionArn = response.subscriptionArn();
+            */
+            String subscriptionArn = "arn:aws:sns:mock:subscription:" + java.util.UUID.randomUUID();
 
             logger.info("User subscribed to topic. SubscriptionArn: {}", subscriptionArn);
             return subscriptionArn;
@@ -168,11 +192,14 @@ public class AwsSnsService {
     // Unsubscribe user from topic
     public void unsubscribeFromTopic(String subscriptionArn) {
         try {
+            // TODO in production: uncomment below to actually unsubscribe
+            /*
             UnsubscribeRequest request = UnsubscribeRequest.builder()
                     .subscriptionArn(subscriptionArn)
                     .build();
 
             snsClient.unsubscribe(request);
+            */
             logger.info("User unsubscribed from topic. SubscriptionArn: {}", subscriptionArn);
 
         } catch (Exception e) {
@@ -184,11 +211,14 @@ public class AwsSnsService {
     // Delete platform endpoint
     public void deletePlatformEndpoint(String endpointArn) {
         try {
+            // TODO in production: uncomment below to actually delete
+            /*
             DeleteEndpointRequest request = DeleteEndpointRequest.builder()
                     .endpointArn(endpointArn)
                     .build();
 
             snsClient.deleteEndpoint(request);
+            */
             logger.info("Platform endpoint deleted: {}", endpointArn);
 
         } catch (Exception e) {
@@ -200,12 +230,18 @@ public class AwsSnsService {
     // Get endpoint attributes (check if valid)
     public Map<String, String> getEndpointAttributes(String endpointArn) {
         try {
+            // TODO in production: uncomment below to actually get attributes
+            /*
             GetEndpointAttributesRequest request = GetEndpointAttributesRequest.builder()
                     .endpointArn(endpointArn)
                     .build();
 
             GetEndpointAttributesResponse response = snsClient.getEndpointAttributes(request);
             return response.attributes();
+            */
+            Map<String, String> attributes = new HashMap<>();
+            attributes.put("Enabled", "true");
+            return attributes;
 
         } catch (Exception e) {
             logger.error("Failed to get endpoint attributes for {}: {}", endpointArn, e.getMessage());
