@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.devofblue.common.exception.ErrorResponse;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -44,29 +45,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
-
-        logger.error("Validation error: {}", ex.getMessage());
-
-        Map<String, String> validationErrors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            validationErrors.put(fieldName, errorMessage);
-        });
-
-        ErrorResponse errorResponse = new ErrorResponse(
-            "VALIDATION_ERROR",
-            "Invalid request data",
-            LocalDateTime.now(),
-            request.getDescription(false),
-            validationErrors
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+    
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(
@@ -165,71 +144,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException ex, WebRequest request) {
+    
 
-        logger.error("Illegal argument: {}", ex.getMessage());
-
-        ErrorResponse errorResponse = new ErrorResponse(
-            "ILLEGAL_ARGUMENT",
-            ex.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false),
-            null
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(
-            Exception ex, WebRequest request) {
-
-        logger.error("Unexpected error: {}", ex.getMessage(), ex);
-
-        ErrorResponse errorResponse = new ErrorResponse(
-            "INTERNAL_ERROR",
-            "An unexpected error occurred",
-            LocalDateTime.now(),
-            request.getDescription(false),
-            null
-        );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
+    
 
     // Error Response DTO
-    public static class ErrorResponse {
-        private String code;
-        private String message;
-        private LocalDateTime timestamp;
-        private String path;
-        private Map<String, String> validationErrors;
-
-        public ErrorResponse(String code, String message, LocalDateTime timestamp, String path,
-                           Map<String, String> validationErrors) {
-            this.code = code;
-            this.message = message;
-            this.timestamp = timestamp;
-            this.path = path;
-            this.validationErrors = validationErrors;
-        }
-
-        // Getters and setters
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-
-        public LocalDateTime getTimestamp() { return timestamp; }
-        public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-
-        public String getPath() { return path; }
-        public void setPath(String path) { this.path = path; }
-
-        public Map<String, String> getValidationErrors() { return validationErrors; }
-        public void setValidationErrors(Map<String, String> validationErrors) { this.validationErrors = validationErrors; }
+    
+    @ExceptionHandler(TemplateNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTemplateNotFoundException(TemplateNotFoundException ex, WebRequest request) {
+        ErrorResponse error = new ErrorResponse("TEMPLATE_NOT_FOUND", ex.getMessage(), LocalDateTime.now(), request.getDescription(false), null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+    @ExceptionHandler(DuplicateTemplateException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateTemplateException(DuplicateTemplateException ex, WebRequest request) {
+        ErrorResponse error = new ErrorResponse("DUPLICATE_TEMPLATE", ex.getMessage(), LocalDateTime.now(), request.getDescription(false), null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
+    
+
 }
+
