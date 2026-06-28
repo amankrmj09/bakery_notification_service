@@ -26,7 +26,7 @@ import java.util.UUID;
 @RequestMapping("/api/admin")
 @Validated
 @Tag(name = "Admin", description = "System administration and monitoring APIs")
-@CrossOrigin(origins = "*", maxAge = 3600)
+
 @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
 public class AdminController {
 

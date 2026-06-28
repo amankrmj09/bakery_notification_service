@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequestMapping("/api/campaigns")
 @Validated
 @Tag(name = "Campaigns", description = "Notification campaign management APIs")
-@CrossOrigin(origins = "*", maxAge = 3600)
+
 public class CampaignController {
 
     private static final Logger logger = LoggerFactory.getLogger(CampaignController.class);

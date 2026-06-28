@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequestMapping("/api/device-tokens")
 @Validated
 @Tag(name = "Device Tokens", description = "Device token management APIs for push notifications")
-@CrossOrigin(origins = "*", maxAge = 3600)
+
 public class DeviceTokenController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeviceTokenController.class);

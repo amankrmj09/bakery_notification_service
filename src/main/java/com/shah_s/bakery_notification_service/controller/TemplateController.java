@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequestMapping("/api/templates")
 @Validated
 @Tag(name = "Templates", description = "Notification template management APIs")
-@CrossOrigin(origins = "*", maxAge = 3600)
+
 public class TemplateController {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateController.class);
