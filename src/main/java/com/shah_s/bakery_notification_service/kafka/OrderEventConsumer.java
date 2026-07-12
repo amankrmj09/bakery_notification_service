@@ -1,7 +1,8 @@
 package com.shah_s.bakery_notification_service.kafka;
 
 import org.devofblue.common.event.OrderEvent;
-import com.shah_s.bakery_notification_service.dto.NotificationRequest;
+import com.shah_s.bakery_notification_service.dto.SendNotificationRequest;
+import com.shah_s.bakery_notification_service.entity.Notification;
 import com.shah_s.bakery_notification_service.service.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,8 @@ public class OrderEventConsumer {
         logger.info("Received OrderEvent for Order ID: {} with status: {}", event.getOrderId(), event.getStatus());
         
         try {
-            NotificationRequest request = new NotificationRequest();
-            request.setType("EMAIL");
+            SendNotificationRequest request = new SendNotificationRequest();
+            request.setType(Notification.NotificationType.EMAIL);
             request.setRecipientEmail(event.getCustomerEmail());
             request.setRecipientName("Customer");
             request.setSource("ORDER_SERVICE");

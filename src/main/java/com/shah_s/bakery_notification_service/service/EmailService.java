@@ -2,24 +2,19 @@ package com.shah_s.bakery_notification_service.service;
 
 import com.shah_s.bakery_notification_service.entity.Notification;
 import com.shah_s.bakery_notification_service.exception.NotificationServiceException;
-// import jakarta.mail.MessagingException;
-// import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.mail.MailException;
-// import org.springframework.mail.SimpleMailMessage;
-// import org.springframework.mail.javamail.JavaMailSender;
-// import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.springframework.web.reactive.function.client.WebClient;
+import com.shah_s.bakery_notification_service.dto.BrevoDtos.*;
 
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,11 +22,19 @@ public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    // @Autowired
-    // private JavaMailSender mailSender;
+    @Value("${brevo.api-key:}")
+    private String apiKey;
 
-    @Autowired
-    private SpringTemplateEngine templateEngine;
+    private WebClient webClient;
+
+    @PostConstruct
+    public void init() {
+        this.webClient = WebClient.builder()
+            .baseUrl("https://api.brevo.com/v3")
+            .defaultHeader("api-key", apiKey)
+            .defaultHeader("Content-Type", "application/json")
+            .build();
+    }
 
     @Value("${notification.email.from}")
     private String fromEmail;
@@ -75,23 +78,41 @@ public class EmailService {
         }
     }
 
+    private void sendBrevoEmail(String to, String toName, String subject, String textContent, String htmlContent, Long templateId, Map<String, Object> params) {
+        if (apiKey == null || apiKey.isEmpty()) {
+            logger.warn("Brevo API key is not configured. Email will not be sent.");
+            return;
+        }
+
+        BrevoEmailRequest request = new BrevoEmailRequest(
+            new Sender(fromName, fromEmail),
+            List.of(new Recipient(to, toName)),
+            subject,
+            htmlContent,
+            textContent,
+            templateId,
+            params
+        );
+
+        try {
+            BrevoEmailResponse response = webClient.post()
+                .uri("/smtp/email")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(BrevoEmailResponse.class)
+                .block();
+            String msgId = response != null ? response.messageId() : null;
+            logger.info("Email sent successfully via Brevo. MessageId: {}", msgId);
+        } catch (Exception e) {
+            logger.error("Failed to send email via Brevo: {}", e.getMessage());
+            throw new NotificationServiceException("Brevo API error: " + e.getMessage());
+        }
+    }
+
     // Send simple text email
     private void sendTextEmail(Notification notification) {
         try {
-            // TODO in production: uncomment below to send actual email
-            /*
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(notification.getRecipientEmail());
-            message.setSubject(notification.getSubject());
-            message.setText(notification.getContent());
-            message.setReplyTo(replyToEmail);
-
-            mailSender.send(message);
-            */
-            logger.info("\n========== EMAIL NOTIFICATION ==========\nTo: {}\nSubject: {}\nContent: {}\n========================================\n", 
-                        notification.getRecipientEmail(), notification.getSubject(), notification.getContent());
-
+            sendBrevoEmail(notification.getRecipientEmail(), notification.getRecipientName(), notification.getSubject(), notification.getContent(), null, null, null);
         } catch (Exception e) {
             logger.error("Failed to send text email: {}", e.getMessage());
             throw new NotificationServiceException("Failed to send text email: " + e.getMessage());
@@ -101,27 +122,7 @@ public class EmailService {
     // Send HTML email
     private void sendHtmlEmail(Notification notification) {
         try {
-            // TODO in production: uncomment below to send actual email
-            /*
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-            helper.setFrom(fromEmail, fromName);
-            helper.setTo(notification.getRecipientEmail());
-            helper.setSubject(notification.getSubject());
-            helper.setText(notification.getContent(), notification.getHtmlContent());
-            helper.setReplyTo(replyToEmail);
-
-            // Add recipient name if available
-            if (notification.getRecipientName() != null) {
-                helper.setTo(notification.getRecipientEmail());
-            }
-
-            mailSender.send(mimeMessage);
-            */
-            logger.info("\n========== HTML EMAIL NOTIFICATION ==========\nTo: {}\nSubject: {}\nContent: {}\n=============================================\n", 
-                        notification.getRecipientEmail(), notification.getSubject(), notification.getContent());
-
+            sendBrevoEmail(notification.getRecipientEmail(), notification.getRecipientName(), notification.getSubject(), notification.getContent(), notification.getHtmlContent(), null, null);
         } catch (Exception e) {
             logger.error("Failed to send HTML email: {}", e.getMessage());
             throw new NotificationServiceException("Failed to send HTML email: " + e.getMessage());
@@ -130,34 +131,12 @@ public class EmailService {
 
     // Send templated email
     public void sendTemplatedEmail(String to, String toName, String subject,
-                                  String templateName, Map<String, Object> variables) {
-        logger.info("Sending templated email: to={}, template={}", to, templateName);
+                                  Long templateId, Map<String, Object> variables) {
+        logger.info("Sending templated email: to={}, templateId={}", to, templateId);
 
         try {
-            // Process template
-            Context context = new Context();
-            context.setVariables(variables);
-            String htmlContent = templateEngine.process(templateName, context);
-
-            // Create and send email
-            // TODO in production: uncomment below to send actual email
-            /*
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-            helper.setFrom(fromEmail, fromName);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText("", htmlContent);
-            helper.setReplyTo(replyToEmail);
-
-            mailSender.send(mimeMessage);
-            */
-            logger.info("\n========== TEMPLATED EMAIL NOTIFICATION ==========\nTo: {}\nSubject: {}\nTemplate: {}\n==================================================\n", 
-                        to, subject, templateName);
-
-            logger.info("Templated email sent successfully: to={}, template={}", to, templateName);
-
+            sendBrevoEmail(to, toName, subject, null, null, templateId, variables);
+            logger.info("Templated email sent successfully: to={}, templateId={}", to, templateId);
         } catch (Exception e) {
             logger.error("Failed to send templated email: {}", e.getMessage());
             throw new NotificationServiceException("Failed to send templated email: " + e.getMessage());
@@ -171,8 +150,8 @@ public class EmailService {
             "activationLink", activationLink,
             "supportEmail", replyToEmail
         );
-
-        sendTemplatedEmail(email, name, "Welcome to Shah's Bakery!", "welcome-email", variables);
+        // TODO ?? set template ID
+        sendTemplatedEmail(email, name, "Welcome to Shah's Bakery!", 1L, variables);
     }
 
     // Send password reset email
@@ -183,8 +162,8 @@ public class EmailService {
             "supportEmail", replyToEmail,
             "expiryTime", "24 hours"
         );
-
-        sendTemplatedEmail(email, name, "Password Reset Request", "password-reset-email", variables);
+        // TODO ?? set template ID
+        sendTemplatedEmail(email, name, "Password Reset Request", 2L, variables);
     }
 
     // Send order confirmation email
@@ -196,10 +175,10 @@ public class EmailService {
             "orderTotal", orderTotal,
             "deliveryType", deliveryType,
             "supportEmail", replyToEmail,
-            "orderDate", LocalDateTime.now()
+            "orderDate", LocalDateTime.now().toString()
         );
-
-        sendTemplatedEmail(email, name, "Order Confirmation - " + orderNumber, "order-confirmation-email", variables);
+        // TODO ?? set template ID
+        sendTemplatedEmail(email, name, "Order Confirmation - " + orderNumber, 3L, variables);
     }
 
     // Send cart abandonment email
@@ -212,8 +191,8 @@ public class EmailService {
             "itemCount", itemCount,
             "supportEmail", replyToEmail
         );
-
-        sendTemplatedEmail(email, name, "Complete Your Order - Items Waiting!", "cart-abandonment-email", variables);
+        // TODO ?? set template ID
+        sendTemplatedEmail(email, name, "Complete Your Order - Items Waiting!", 4L, variables);
     }
 
     // Send promotional email
@@ -226,8 +205,8 @@ public class EmailService {
             "expiryDate", expiryDate,
             "supportEmail", replyToEmail
         );
-
-        sendTemplatedEmail(email, name, "Special Offer Just for You!", "promotional-email", variables);
+        // TODO ?? set template ID
+        sendTemplatedEmail(email, name, "Special Offer Just for You!", 5L, variables);
     }
 
     // Send feedback request email
@@ -239,38 +218,21 @@ public class EmailService {
             "feedbackUrl", feedbackUrl,
             "supportEmail", replyToEmail
         );
-
-        sendTemplatedEmail(email, name, "How was your experience?", "feedback-request-email", variables);
+        // TODO ?? set template ID
+        sendTemplatedEmail(email, name, "How was your experience?", 6L, variables);
     }
 
     // Test email connectivity
     public boolean testEmailConnection() {
-        try {
-            // TODO in production: uncomment below to send actual email
-            /*
-            SimpleMailMessage testMessage = new SimpleMailMessage();
-            testMessage.setFrom(fromEmail);
-            testMessage.setTo(fromEmail); // Send to self
-            testMessage.setSubject("Email Service Test");
-            testMessage.setText("This is a test email to verify email service connectivity.");
-
-            mailSender.send(testMessage);
-            */
-            logger.info("\n========== TEST EMAIL ==========\nTo: {}\nSubject: {}\n================================\n", 
-                        fromEmail, "Email Service Test");
-
-            logger.info("Email connectivity test successful");
-            return true;
-
-        } catch (Exception e) {
-            logger.error("Email connectivity test failed: {}", e.getMessage());
+        if (webClient == null || apiKey == null || apiKey.isEmpty()) {
             return false;
         }
+        return true;
     }
 
     // Get email service health status
     public Map<String, Object> getEmailServiceHealth() {
-        Map<String, Object> health = Map.of(
+        return Map.of(
             "enabled", emailEnabled,
             "fromEmail", fromEmail,
             "fromName", fromName,
@@ -279,7 +241,5 @@ public class EmailService {
             "connectivity", testEmailConnection(),
             "timestamp", LocalDateTime.now()
         );
-
-        return health;
     }
 }

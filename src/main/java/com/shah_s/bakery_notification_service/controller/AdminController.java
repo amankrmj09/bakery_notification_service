@@ -224,7 +224,7 @@ public class AdminController {
                             testEmail,
                             "Test User",
                             "Email Service Test",
-                            "test-email",
+                            100L,
                             Map.of("testTime", LocalDateTime.now())
                     );
                     result.put("testEmail", "sent");
@@ -455,7 +455,7 @@ public class AdminController {
                             recipient,
                             "Test User",
                             "Test Notification",
-                            "test-email",
+                            100L,
                             Map.of("message", message, "timestamp", LocalDateTime.now())
                     );
                     result.put("status", "sent");

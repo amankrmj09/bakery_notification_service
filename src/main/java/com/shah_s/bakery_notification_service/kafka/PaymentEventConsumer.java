@@ -1,7 +1,8 @@
 package com.shah_s.bakery_notification_service.kafka;
 
 import org.devofblue.common.event.PaymentEvent;
-import com.shah_s.bakery_notification_service.dto.NotificationRequest;
+import com.shah_s.bakery_notification_service.dto.SendNotificationRequest;
+import com.shah_s.bakery_notification_service.entity.Notification;
 import com.shah_s.bakery_notification_service.service.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,8 @@ public class PaymentEventConsumer {
         }
         
         try {
-            NotificationRequest request = new NotificationRequest();
-            request.setType("EMAIL");
+            SendNotificationRequest request = new SendNotificationRequest();
+            request.setType(Notification.NotificationType.EMAIL);
             // recipientEmail needs to be fetched if not present in PaymentEvent, but wait, PaymentEvent doesn't have email!
             // I'll send it to user ID and NotificationService might look up the email.
             request.setSource("PAYMENT_SERVICE");

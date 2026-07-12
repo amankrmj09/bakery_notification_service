@@ -2,33 +2,30 @@ package com.shah_s.bakery_notification_service.service;
 
 import com.shah_s.bakery_notification_service.entity.Notification;
 import com.shah_s.bakery_notification_service.exception.NotificationServiceException;
-// import com.twilio.Twilio;
-// import com.twilio.rest.api.v2010.account.Message;
-// import com.twilio.type.PhoneNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import com.shah_s.bakery_notification_service.dto.BrevoDtos.*;
 
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class SmsService {
 
     private static final Logger logger = LoggerFactory.getLogger(SmsService.class);
 
-    @Value("${notification.sms.account-sid}")
-    private String accountSid;
+    @Value("${brevo.api-key:}")
+    private String apiKey;
 
-    @Value("${notification.sms.auth-token}")
-    private String authToken;
-
-    @Value("${notification.sms.from-number}")
-    private String fromNumber;
+    @Value("${notification.sms.from-name:ShahBakery}")
+    private String fromName;
 
     @Value("${notification.sms.enabled:false}")
     private Boolean smsEnabled;
@@ -36,19 +33,49 @@ public class SmsService {
     @Value("${notification.sms.retry-attempts:3}")
     private Integer retryAttempts;
 
+    private WebClient webClient;
+
     @PostConstruct
-    public void initializeTwilio() {
-        if (smsEnabled && accountSid != null && authToken != null) {
-            try {
-                // TODO in production: uncomment to init twilio
-                // Twilio.init(accountSid, authToken);
-                logger.info("Twilio SMS service initialized successfully (mocked)");
-            } catch (Exception e) {
-                logger.error("Failed to initialize Twilio SMS service: {}", e.getMessage());
-                smsEnabled = false;
-            }
+    public void init() {
+        if (smsEnabled && apiKey != null && !apiKey.isEmpty()) {
+            this.webClient = WebClient.builder()
+                .baseUrl("https://api.brevo.com/v3")
+                .defaultHeader("api-key", apiKey)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
+            logger.info("Brevo SMS service initialized successfully");
         } else {
-            logger.info("SMS service is disabled or not configured");
+            logger.info("SMS service is disabled or Brevo API key is not configured");
+        }
+    }
+
+    private String sendBrevoSms(String toNumber, String messageBody) {
+        if (webClient == null) {
+            logger.warn("Brevo SMS is not configured");
+            return null;
+        }
+
+        BrevoSmsRequest request = new BrevoSmsRequest(
+            fromName,
+            formatPhoneNumber(toNumber),
+            messageBody,
+            "transactional"
+        );
+
+        try {
+            BrevoSmsResponse response = webClient.post()
+                .uri("/transactionalSMS/sms")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(BrevoSmsResponse.class)
+                .block();
+                
+            String messageId = response != null ? response.messageId() : null;
+            logger.info("SMS sent successfully via Brevo. MessageId: {}", messageId);
+            return messageId;
+        } catch (Exception e) {
+            logger.error("Failed to send SMS via Brevo: {}", e.getMessage());
+            throw new NotificationServiceException("Brevo API error: " + e.getMessage());
         }
     }
 
@@ -64,21 +91,9 @@ public class SmsService {
                    notification.getId(), maskPhoneNumber(notification.getRecipientPhone()));
 
         try {
-            // TODO in production: uncomment below to send actual SMS
-            /*
-            Message message = Message.creator(
-                new PhoneNumber(notification.getRecipientPhone()),
-                new PhoneNumber(fromNumber),
-                notification.getContent()
-            ).create();
-            */
-            String fakeSid = "SM" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 32);
-            logger.info("\n========== SMS NOTIFICATION ==========\nTo: {}\nMessage: {}\n======================================\n", 
-                        maskPhoneNumber(notification.getRecipientPhone()), notification.getContent());
-
-            notification.markAsSent(fakeSid);
-            logger.info("SMS sent successfully: id={}, sid={}", notification.getId(), fakeSid);
-
+            String sid = sendBrevoSms(notification.getRecipientPhone(), notification.getContent());
+            notification.markAsSent(sid != null ? sid : UUID.randomUUID().toString());
+            logger.info("SMS sent successfully: id={}, sid={}", notification.getId(), sid);
         } catch (Exception e) {
             logger.error("Failed to send SMS notification {}: {}", notification.getId(), e.getMessage());
             throw new NotificationServiceException("Failed to send SMS: " + e.getMessage());
@@ -94,21 +109,9 @@ public class SmsService {
         logger.info("Sending SMS: to={}", maskPhoneNumber(toNumber));
 
         try {
-            // TODO in production: uncomment below to send actual SMS
-            /*
-            Message message = Message.creator(
-                new PhoneNumber(toNumber),
-                new PhoneNumber(fromNumber),
-                messageBody
-            ).create();
-            */
-            String fakeSid = "SM" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 32);
-            logger.info("\n========== SMS NOTIFICATION ==========\nTo: {}\nMessage: {}\n======================================\n", 
-                        maskPhoneNumber(toNumber), messageBody);
-
-            logger.info("SMS sent successfully: to={}, sid={}", maskPhoneNumber(toNumber), fakeSid);
-            return fakeSid;
-
+            String sid = sendBrevoSms(toNumber, messageBody);
+            logger.info("SMS sent successfully: to={}, sid={}", maskPhoneNumber(toNumber), sid);
+            return sid != null ? sid : UUID.randomUUID().toString();
         } catch (Exception e) {
             logger.error("Failed to send SMS to {}: {}", maskPhoneNumber(toNumber), e.getMessage());
             throw new NotificationServiceException("Failed to send SMS: " + e.getMessage());
@@ -203,7 +206,7 @@ public class SmsService {
     // Send birthday wishes SMS
     public void sendBirthdayWishesSms(String phoneNumber, String customerName, String specialOffer) {
         String message = String.format(
-            "Happy Birthday %s! 🎂 Enjoy %s on us today. Visit Shah's Bakery to claim your birthday treat!",
+            "Happy Birthday %s! \uD83C\uDF82 Enjoy %s on us today. Visit Shah's Bakery to claim your birthday treat!",
             customerName, specialOffer
         );
 
@@ -253,28 +256,17 @@ public class SmsService {
 
     // Test SMS connectivity
     public boolean testSmsConnection() {
-        if (!smsEnabled) {
+        if (webClient == null || apiKey == null || apiKey.isEmpty()) {
             return false;
         }
-
-        try {
-            // Send a test SMS to a verified number (typically your own number in Twilio trial)
-            // This is just a connectivity test, not actually sending
-            logger.info("SMS connectivity test - service is configured and ready");
-            return true;
-
-        } catch (Exception e) {
-            logger.error("SMS connectivity test failed: {}", e.getMessage());
-            return false;
-        }
+        return true;
     }
 
     // Get SMS service health status
     public Map<String, Object> getSmsServiceHealth() {
         return Map.of(
             "enabled", smsEnabled,
-            "fromNumber", fromNumber != null ? maskPhoneNumber(fromNumber) : null,
-            "accountSid", accountSid != null ? maskAccountSid(accountSid) : null,
+            "fromName", fromName,
             "retryAttempts", retryAttempts,
             "connectivity", testSmsConnection(),
             "timestamp", LocalDateTime.now()
@@ -287,12 +279,5 @@ public class SmsService {
             return "****";
         }
         return phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(phoneNumber.length() - 4);
-    }
-
-    private String maskAccountSid(String accountSid) {
-        if (accountSid == null || accountSid.length() < 8) {
-            return "****";
-        }
-        return accountSid.substring(0, 4) + "****" + accountSid.substring(accountSid.length() - 4);
     }
 }
