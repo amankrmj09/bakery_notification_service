@@ -1,3 +1,36 @@
 spring:
   datasource:
     url: jdbc:postgresql://blubug.me:8006/bakery_notifications
+    username: notification_user
+    password: notification_password
+  mail:
+    username: your-email@gmail.com
+    password: your-app-password
+  kafka:
+    bootstrap-servers: localhost:9092
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+aws:
+  region: us-east-1
+  access-key: your-aws-access-key
+  secret-key: your-aws-secret-key
+  sns:
+    android-platform-arn: arn:aws:sns:us-east-1:123456789:app/FCM/YourBakeryApp-Android
+    general-topic-arn: arn:aws:sns:us-east-1:123456789:bakery-general-notifications
+    marketing-topic-arn: arn:aws:sns:us-east-1:123456789:bakery-marketing
+    orders-topic-arn: arn:aws:sns:us-east-1:123456789:bakery-orders
+brevo:
+  api-key: your-brevo-api-key
+notification:
+  email:
+    from: noreply@shahs-bakery.com
+    reply-to: support@shahs-bakery.com
+  sms:
+    account-sid: your-twilio-sid
+    auth-token: your-twilio-token
+    from-number: +1234567890
+    enabled: false
+  push:
+    enabled: false
