@@ -23,3 +23,8 @@ notification:
     enabled: ${SMS_ENABLED}
   push:
     enabled: ${PUSH_ENABLED}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
