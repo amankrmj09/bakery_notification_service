@@ -1,7 +1,8 @@
 package com.shah_s.bakery_notification_service.kafka;
 
 import org.devofblue.common.event.PaymentEvent;
-import com.shah_s.bakery_notification_service.dto.SendNotificationRequest;
+import com.shah_s.bakery_notification_service.config.BrevoTemplateProperties;
+import com.shah_s.bakery_notification_service.dto.SendNotificationRequestDto;
 import com.shah_s.bakery_notification_service.entity.Notification;
 import com.shah_s.bakery_notification_service.service.NotificationService;
 import org.slf4j.Logger;
@@ -14,9 +15,11 @@ public class PaymentEventConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentEventConsumer.class);
     private final NotificationService notificationService;
+    private final BrevoTemplateProperties templateProperties;
 
-    public PaymentEventConsumer(NotificationService notificationService) {
+    public PaymentEventConsumer(NotificationService notificationService, BrevoTemplateProperties templateProperties) {
         this.notificationService = notificationService;
+        this.templateProperties = templateProperties;
     }
 
     @KafkaListener(topics = "payment-events", groupId = "notification-service-group")
@@ -28,18 +31,21 @@ public class PaymentEventConsumer {
         }
         
         try {
-            SendNotificationRequest request = new SendNotificationRequest();
-            request.setType(Notification.NotificationType.EMAIL);
-            // recipientEmail needs to be fetched if not present in PaymentEvent, but wait, PaymentEvent doesn't have email!
-            // I'll send it to user ID and NotificationService might look up the email.
-            request.setSource("PAYMENT_SERVICE");
+            SendNotificationRequestDto request = new SendNotificationRequestDto();
+            request.setRecipientEmail(event.getCustomerEmail() != null ? event.getCustomerEmail() : "customer@example.com"); // fallback just in case old events don't have it
             request.setTitle("Payment Update");
-            request.setSubject("Payment Update");
+            
+            // Set dynamic parameters
+            request.getParams().put("paymentId", event.getPaymentId());
+            request.getParams().put("orderId", event.getOrderId());
+            request.getParams().put("amount", event.getAmount());
+            request.getParams().put("status", event.getStatus());
             
             if ("COMPLETED".equals(event.getStatus())) {
-                request.setContent("Your payment of $" + event.getAmount() + " was successful for Order ID: " + event.getOrderId());
+                request.setTemplateId(templateProperties.getPayment());
             } else {
-                request.setContent("Your payment of $" + event.getAmount() + " failed for Order ID: " + event.getOrderId());
+                // If payment failed, we might use transaction or payment template with different param
+                request.setTemplateId(templateProperties.getPayment());
             }
             
             notificationService.sendNotification(request);

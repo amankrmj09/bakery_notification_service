@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class DeviceRegistrationRequest {
+public class DeviceRegistrationRequestDto {
 
     // Getters and Setters
     private UUID userId; // NULL for guest registration
@@ -60,14 +60,14 @@ public class DeviceRegistrationRequest {
     private Map<String, Object> metadata;
 
     // Constructors
-    public DeviceRegistrationRequest() {}
+    public DeviceRegistrationRequestDto() {}
 
-    public DeviceRegistrationRequest(String deviceToken, String platform) {
+    public DeviceRegistrationRequestDto(String deviceToken, String platform) {
         this.deviceToken = deviceToken;
         this.platform = platform;
     }
 
-    public DeviceRegistrationRequest(UUID userId, String deviceToken, String platform) {
+    public DeviceRegistrationRequestDto(UUID userId, String deviceToken, String platform) {
         this(deviceToken, platform);
         this.userId = userId;
     }

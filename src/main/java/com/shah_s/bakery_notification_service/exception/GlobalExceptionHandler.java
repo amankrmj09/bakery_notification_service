@@ -8,19 +8,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.devofblue.common.exception.ErrorResponse;
+import org.devofblue.common.exception.ErrorResponseDto;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -29,12 +25,12 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(NotificationServiceException.class)
-    public ResponseEntity<ErrorResponse> handleNotificationServiceException(
+    public ResponseEntity<ErrorResponseDto> handleNotificationServiceException(
             NotificationServiceException ex, WebRequest request) {
 
         logger.error("Notification service error: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
             "NOTIFICATION_SERVICE_ERROR",
             ex.getMessage(),
             LocalDateTime.now(),
@@ -45,10 +41,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    
-
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolationException(
             ConstraintViolationException ex, WebRequest request) {
 
         logger.error("Constraint violation error: {}", ex.getMessage());
@@ -60,7 +54,7 @@ public class GlobalExceptionHandler {
             validationErrors.put(fieldName, errorMessage);
         }
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
             "CONSTRAINT_VIOLATION",
             "Constraint violation in request data",
             LocalDateTime.now(),
@@ -72,12 +66,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+    public ResponseEntity<ErrorResponseDto> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex, WebRequest request) {
 
         logger.error("HTTP message not readable: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
             "MALFORMED_REQUEST",
             "Malformed JSON request",
             LocalDateTime.now(),
@@ -89,7 +83,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+    public ResponseEntity<ErrorResponseDto> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
 
         logger.error("Method argument type mismatch: {}", ex.getMessage());
@@ -97,7 +91,7 @@ public class GlobalExceptionHandler {
         String message = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s",
                                      ex.getValue(), ex.getName(), ex.getRequiredType().getSimpleName());
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
             "INVALID_PARAMETER_TYPE",
             message,
             LocalDateTime.now(),
@@ -109,14 +103,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
+    public ResponseEntity<ErrorResponseDto> handleMissingServletRequestParameterException(
             MissingServletRequestParameterException ex, WebRequest request) {
 
         logger.error("Missing request parameter: {}", ex.getMessage());
 
         String message = String.format("Missing required parameter: %s", ex.getParameterName());
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
             "MISSING_PARAMETER",
             message,
             LocalDateTime.now(),
@@ -128,12 +122,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
+    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(
             AccessDeniedException ex, WebRequest request) {
 
         logger.error("Access denied: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
             "ACCESS_DENIED",
             "Access denied - insufficient permissions",
             LocalDateTime.now(),
@@ -143,25 +137,4 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
-
-    
-
-    
-
-    // Error Response DTO
-    
-    @ExceptionHandler(TemplateNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleTemplateNotFoundException(TemplateNotFoundException ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse("TEMPLATE_NOT_FOUND", ex.getMessage(), LocalDateTime.now(), request.getDescription(false), null);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
-    @ExceptionHandler(DuplicateTemplateException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateTemplateException(DuplicateTemplateException ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse("DUPLICATE_TEMPLATE", ex.getMessage(), LocalDateTime.now(), request.getDescription(false), null);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
-    }
-
-    
-
 }
-

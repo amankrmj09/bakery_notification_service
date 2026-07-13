@@ -1,13 +1,11 @@
-﻿plugins {
+plugins {
     java
     id("org.springframework.boot") version "3.5.15"
     id("io.spring.dependency-management") version "1.1.7"
     // id("org.asciidoctor.jvm.convert") version "4.0.3"
 }
 
-group = "com.dev_of_blue"
-version = "1.0.0"
-description = "bakery_notification_service for notification management"
+description = "Notification Service for sending emails and alerts"
 
 java {
     toolchain {
@@ -58,7 +56,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.kafka:spring-kafka")
     testImplementation("org.springframework.batch:spring-batch-test")
-    compileOnly("org.projectlombok:lombok")
+    implementation("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     runtimeOnly("com.h2database:h2")

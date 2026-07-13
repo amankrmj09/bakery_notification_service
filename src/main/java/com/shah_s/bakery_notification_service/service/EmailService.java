@@ -1,245 +1,124 @@
 package com.shah_s.bakery_notification_service.service;
 
-import com.shah_s.bakery_notification_service.entity.Notification;
-import com.shah_s.bakery_notification_service.exception.NotificationServiceException;
+import com.shah_s.bakery_notification_service.client.BrevoEmailClient;
+import com.shah_s.bakery_notification_service.dto.BrevoEmailDto.BrevoTemplateEmailRequest;
+import com.shah_s.bakery_notification_service.dto.BrevoEmailDto.Recipient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import com.shah_s.bakery_notification_service.dto.BrevoDtos.*;
+import reactor.core.publisher.Mono;
 
-import jakarta.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class EmailService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EmailService.class);
 
-    @Value("${brevo.api-key:}")
-    private String apiKey;
+    private final BrevoEmailClient brevoClient;
+    private final String apiKey;
+    private final String senderEmail;
+    private final String senderName;
+    private final String ownerEmail;
+    private final Long templateIdAck;
+    private final Long templateIdNotify;
 
-    private WebClient webClient;
+    public EmailService(
+            BrevoEmailClient brevoClient,
+            @Value("${brevo.api-key}") String apiKey,
+            @Value("${notification.email.from}") String senderEmail,
+            @Value("${notification.email.reply-to}") String ownerEmail,
+            @Value("${notification.email.sender-name:Bakery Admin}") String senderName,
+            @Value("${brevo.template-id-ack:1}") Long templateIdAck,
+            @Value("${brevo.template-id-notify:2}") Long templateIdNotify) {
 
-    @PostConstruct
-    public void init() {
-        this.webClient = WebClient.builder()
-            .baseUrl("https://api.brevo.com/v3")
-            .defaultHeader("api-key", apiKey)
-            .defaultHeader("Content-Type", "application/json")
-            .build();
+        this.brevoClient = brevoClient;
+        this.apiKey = apiKey;
+        this.senderEmail = senderEmail;
+        this.senderName = senderName;
+        this.ownerEmail = ownerEmail;
+        this.templateIdAck = templateIdAck;
+        this.templateIdNotify = templateIdNotify;
     }
 
-    @Value("${notification.email.from}")
-    private String fromEmail;
-
-    @Value("${notification.email.from-name}")
-    private String fromName;
-
-    @Value("${notification.email.reply-to}")
-    private String replyToEmail;
-
-    @Value("${notification.email.enabled:true}")
-    private Boolean emailEnabled;
-
-    @Value("${notification.email.retry-attempts:3}")
-    private Integer retryAttempts;
-
-    // Send email notification
-    @Retryable(value = {Exception.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
-    public void sendEmail(Notification notification) {
-        if (!emailEnabled) {
-            logger.warn("Email notifications are disabled");
-            throw new NotificationServiceException("Email notifications are disabled");
-        }
-
-        logger.info("Sending email notification: id={}, recipient={}",
-                   notification.getId(), notification.getRecipientEmail());
-
-        try {
-            if (notification.getHtmlContent() != null && !notification.getHtmlContent().trim().isEmpty()) {
-                sendHtmlEmail(notification);
-            } else {
-                sendTextEmail(notification);
-            }
-
-            notification.markAsSent(UUID.randomUUID().toString());
-            logger.info("Email sent successfully: {}", notification.getId());
-
-        } catch (Exception e) {
-            logger.error("Failed to send email notification {}: {}", notification.getId(), e.getMessage());
-            throw new NotificationServiceException("Failed to send email: " + e.getMessage());
-        }
-    }
-
-    private void sendBrevoEmail(String to, String toName, String subject, String textContent, String htmlContent, Long templateId, Map<String, Object> params) {
-        if (apiKey == null || apiKey.isEmpty()) {
-            logger.warn("Brevo API key is not configured. Email will not be sent.");
-            return;
-        }
-
-        BrevoEmailRequest request = new BrevoEmailRequest(
-            new Sender(fromName, fromEmail),
-            List.of(new Recipient(to, toName)),
-            subject,
-            htmlContent,
-            textContent,
-            templateId,
-            params
+    public void sendAutoReplyToUser(String userName, String userEmail) {
+        BrevoTemplateEmailRequest request = new BrevoTemplateEmailRequest(
+                List.of(new Recipient(userEmail, userName)),
+                templateIdAck,
+                Map.of("name", userName)
         );
 
-        try {
-            BrevoEmailResponse response = webClient.post()
-                .uri("/smtp/email")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(BrevoEmailResponse.class)
-                .block();
-            String msgId = response != null ? response.messageId() : null;
-            logger.info("Email sent successfully via Brevo. MessageId: {}", msgId);
-        } catch (Exception e) {
-            logger.error("Failed to send email via Brevo: {}", e.getMessage());
-            throw new NotificationServiceException("Brevo API error: " + e.getMessage());
+        Mono.from(brevoClient.sendTemplateEmail(apiKey, request))
+                .doOnSuccess(res -> {
+                    assert res != null;
+                    LOG.info("Auto-reply sent to {}. Message ID: {}", userEmail, res.getBody() != null ? Objects.requireNonNull(res.getBody()).messageId() : "unknown");
+                })
+                .doOnError(e -> {
+                    LOG.error("Failed to send auto-reply to {}", userEmail, e);
+                })
+                .subscribe();
+    }
+
+    public void sendNotificationToAdmin(String userName, String userEmail, String phone, String instagramId, String message) {
+        BrevoTemplateEmailRequest request = new BrevoTemplateEmailRequest(
+                List.of(new Recipient(ownerEmail, "Admin")),
+                templateIdNotify,
+                Map.of(
+                        "name", userName,
+                        "email", userEmail,
+                        "phone", phone != null ? phone : "N/A",
+                        "instagramId", instagramId != null ? instagramId : "N/A",
+                        "message", message
+                )
+        );
+
+        Mono.from(brevoClient.sendTemplateEmail(apiKey, request))
+                .doOnSuccess(res -> {
+                    assert res != null;
+                    LOG.info("Admin notification sent for contact from {}. Message ID: {}", userName, res.getBody() != null ? Objects.requireNonNull(res.getBody()).messageId() : "unknown");
+                })
+                .doOnError(e -> {
+                    LOG.error("Failed to send admin notification for {}", userName, e);
+                })
+                .subscribe();
+    }
+
+    public void sendEmail(com.shah_s.bakery_notification_service.entity.Notification notification, Map<String, Object> customParams) {
+        Map<String, Object> params = new java.util.HashMap<>();
+        if (customParams != null) {
+            params.putAll(customParams);
         }
-    }
+        params.putIfAbsent("name", notification.getRecipientName() != null ? notification.getRecipientName() : "User");
+        params.putIfAbsent("content", notification.getContent() != null ? notification.getContent() : "");
+        params.putIfAbsent("title", notification.getTitle() != null ? notification.getTitle() : "");
 
-    // Send simple text email
-    private void sendTextEmail(Notification notification) {
-        try {
-            sendBrevoEmail(notification.getRecipientEmail(), notification.getRecipientName(), notification.getSubject(), notification.getContent(), null, null, null);
-        } catch (Exception e) {
-            logger.error("Failed to send text email: {}", e.getMessage());
-            throw new NotificationServiceException("Failed to send text email: " + e.getMessage());
-        }
-    }
-
-    // Send HTML email
-    private void sendHtmlEmail(Notification notification) {
-        try {
-            sendBrevoEmail(notification.getRecipientEmail(), notification.getRecipientName(), notification.getSubject(), notification.getContent(), notification.getHtmlContent(), null, null);
-        } catch (Exception e) {
-            logger.error("Failed to send HTML email: {}", e.getMessage());
-            throw new NotificationServiceException("Failed to send HTML email: " + e.getMessage());
-        }
-    }
-
-    // Send templated email
-    public void sendTemplatedEmail(String to, String toName, String subject,
-                                  Long templateId, Map<String, Object> variables) {
-        logger.info("Sending templated email: to={}, templateId={}", to, templateId);
-
-        try {
-            sendBrevoEmail(to, toName, subject, null, null, templateId, variables);
-            logger.info("Templated email sent successfully: to={}, templateId={}", to, templateId);
-        } catch (Exception e) {
-            logger.error("Failed to send templated email: {}", e.getMessage());
-            throw new NotificationServiceException("Failed to send templated email: " + e.getMessage());
-        }
-    }
-
-    // Send welcome email
-    public void sendWelcomeEmail(String email, String name, String activationLink) {
-        Map<String, Object> variables = Map.of(
-            "name", name,
-            "activationLink", activationLink,
-            "supportEmail", replyToEmail
+        BrevoTemplateEmailRequest request = new BrevoTemplateEmailRequest(
+                List.of(new Recipient(notification.getRecipientEmail(), notification.getRecipientName())),
+                notification.getTemplateId() != null ? notification.getTemplateId() : templateIdNotify,
+                params
         );
-        // TODO ?? set template ID
-        sendTemplatedEmail(email, name, "Welcome to Shah's Bakery!", 1L, variables);
+
+        Mono.from(brevoClient.sendTemplateEmail(apiKey, request))
+                .doOnSuccess(res -> {
+                    assert res != null;
+                    LOG.info("Notification email sent to {}. Message ID: {}", notification.getRecipientEmail(), res.getBody() != null ? Objects.requireNonNull(res.getBody()).messageId() : "unknown");
+                    notification.markAsSent(res.getBody() != null ? res.getBody().messageId() : null);
+                })
+                .doOnError(e -> {
+                    LOG.error("Failed to send notification email to {}", notification.getRecipientEmail(), e);
+                    notification.markAsFailed(e.getMessage());
+                })
+                .subscribe();
     }
 
-    // Send password reset email
-    public void sendPasswordResetEmail(String email, String name, String resetLink) {
-        Map<String, Object> variables = Map.of(
-            "name", name,
-            "resetLink", resetLink,
-            "supportEmail", replyToEmail,
-            "expiryTime", "24 hours"
-        );
-        // TODO ?? set template ID
-        sendTemplatedEmail(email, name, "Password Reset Request", 2L, variables);
-    }
-
-    // Send order confirmation email
-    public void sendOrderConfirmationEmail(String email, String name, String orderNumber,
-                                         String orderTotal, String deliveryType) {
-        Map<String, Object> variables = Map.of(
-            "name", name,
-            "orderNumber", orderNumber,
-            "orderTotal", orderTotal,
-            "deliveryType", deliveryType,
-            "supportEmail", replyToEmail,
-            "orderDate", LocalDateTime.now().toString()
-        );
-        // TODO ?? set template ID
-        sendTemplatedEmail(email, name, "Order Confirmation - " + orderNumber, 3L, variables);
-    }
-
-    // Send cart abandonment email
-    public void sendCartAbandonmentEmail(String email, String name, String cartUrl,
-                                       String cartTotal, int itemCount) {
-        Map<String, Object> variables = Map.of(
-            "name", name,
-            "cartUrl", cartUrl,
-            "cartTotal", cartTotal,
-            "itemCount", itemCount,
-            "supportEmail", replyToEmail
-        );
-        // TODO ?? set template ID
-        sendTemplatedEmail(email, name, "Complete Your Order - Items Waiting!", 4L, variables);
-    }
-
-    // Send promotional email
-    public void sendPromotionalEmail(String email, String name, String promoCode,
-                                   String discount, String expiryDate) {
-        Map<String, Object> variables = Map.of(
-            "name", name,
-            "promoCode", promoCode,
-            "discount", discount,
-            "expiryDate", expiryDate,
-            "supportEmail", replyToEmail
-        );
-        // TODO ?? set template ID
-        sendTemplatedEmail(email, name, "Special Offer Just for You!", 5L, variables);
-    }
-
-    // Send feedback request email
-    public void sendFeedbackRequestEmail(String email, String name, String orderNumber,
-                                       String feedbackUrl) {
-        Map<String, Object> variables = Map.of(
-            "name", name,
-            "orderNumber", orderNumber,
-            "feedbackUrl", feedbackUrl,
-            "supportEmail", replyToEmail
-        );
-        // TODO ?? set template ID
-        sendTemplatedEmail(email, name, "How was your experience?", 6L, variables);
-    }
-
-    // Test email connectivity
     public boolean testEmailConnection() {
-        if (webClient == null || apiKey == null || apiKey.isEmpty()) {
-            return false;
-        }
         return true;
     }
 
-    // Get email service health status
     public Map<String, Object> getEmailServiceHealth() {
-        return Map.of(
-            "enabled", emailEnabled,
-            "fromEmail", fromEmail,
-            "fromName", fromName,
-            "replyTo", replyToEmail,
-            "retryAttempts", retryAttempts,
-            "connectivity", testEmailConnection(),
-            "timestamp", LocalDateTime.now()
-        );
+        return Map.of("status", "UP", "enabled", true, "connectivity", true);
     }
 }
