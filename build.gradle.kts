@@ -34,9 +34,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
-    // TODO in production: Uncomment below to use actual Mail service
-    // implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -45,17 +42,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
-    implementation("org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE")
 
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-            implementation("org.springframework.retry:spring-retry")
-    implementation("org.springframework.boot:spring-boot-starter-batch")
+    implementation("org.springframework.retry:spring-retry")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.kafka:spring-kafka")
-    testImplementation("org.springframework.batch:spring-batch-test")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
