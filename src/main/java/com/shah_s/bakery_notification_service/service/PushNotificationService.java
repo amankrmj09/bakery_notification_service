@@ -21,8 +21,9 @@ public class PushNotificationService {
 
     private static final Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
 
-    @Autowired
-    private AwsSnsService awsSnsService;
+    //TODO to connect and manage the push notification service
+    // @Autowired
+    // private AwsSnsService awsSnsService;
 
     @Autowired
     private DeviceTokenRepository deviceTokenRepository;
@@ -351,7 +352,7 @@ public class PushNotificationService {
             "timeToLive", timeToLive,
             "defaultSound", defaultSound,
             "badgeCount", badgeCount,
-            "awsSnsConfigured", awsSnsService != null,
+            "awsSnsConfigured", false,
             "timestamp", LocalDateTime.now()
         );
     }

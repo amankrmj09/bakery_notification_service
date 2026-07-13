@@ -52,13 +52,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    // TODO in production: Uncomment below to use actual SmsService
-    // implementation("com.twilio.sdk:twilio:11.0.0")
-    // TODO in production: Uncomment below to use actual AwsSnsService
-    // implementation("software.amazon.awssdk:sns:2.34.6")
-    // implementation("software.amazon.awssdk:core:2.34.6")
-    // implementation("software.amazon.awssdk:auth:2.34.6")
-    implementation("org.springframework.retry:spring-retry")
+            implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.boot:spring-boot-starter-batch")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
     implementation("org.springframework.cloud:spring-cloud-starter-config")

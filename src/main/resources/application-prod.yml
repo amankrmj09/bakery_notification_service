@@ -12,25 +12,14 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URL}
-aws:
-  region: ${AWS_REGION}
-  access-key: ${AWS_ACCESS_KEY_ID}
-  secret-key: ${AWS_SECRET_ACCESS_KEY}
-  sns:
-    android-platform-arn: ${AWS_SNS_ANDROID_PLATFORM_ARN}
-    general-topic-arn: ${AWS_SNS_GENERAL_TOPIC_ARN}
-    marketing-topic-arn: ${AWS_SNS_MARKETING_TOPIC_ARN}
-    orders-topic-arn: ${AWS_SNS_ORDERS_TOPIC_ARN}
 brevo:
   api-key: ${BREVO_API_KEY}
 notification:
   email:
+    enabled: ${EMAIL_ENABLED}
     from: ${NOTIFICATION_FROM_EMAIL}
     reply-to: ${NOTIFICATION_REPLY_TO}
   sms:
-    account-sid: ${TWILIO_ACCOUNT_SID}
-    auth-token: ${TWILIO_AUTH_TOKEN}
-    from-number: ${TWILIO_FROM_NUMBER}
     enabled: ${SMS_ENABLED}
   push:
     enabled: ${PUSH_ENABLED}

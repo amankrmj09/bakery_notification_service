@@ -33,8 +33,9 @@ public class DeviceTokenService {
     @Autowired
     private DeviceTokenRepository deviceTokenRepository;
 
-    @Autowired
-    private AwsSnsService awsSnsService;
+    //TODO to connect and manage the push notification service
+    // @Autowired
+    // private AwsSnsService awsSnsService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -466,9 +467,9 @@ public class DeviceTokenService {
         try {
             if (token.getSnsEndpointArn() != null) {
                 // Check if endpoint is still valid
-                Map<String, String> attributes = awsSnsService.getEndpointAttributes(token.getSnsEndpointArn());
+                // Map<String, String> attributes = awsSnsService.getEndpointAttributes(token.getSnsEndpointArn());
 
-                if (attributes.isEmpty() || "false".equals(attributes.get("Enabled"))) {
+                if (attributes.isEmpty() || "false".equals("true")) {
                     // Endpoint is invalid, create new one
                     createSnsEndpoint(token);
                 } else {
@@ -487,9 +488,9 @@ public class DeviceTokenService {
     private void validateSingleToken(DeviceToken token) {
         try {
             if (token.getSnsEndpointArn() != null) {
-                Map<String, String> attributes = awsSnsService.getEndpointAttributes(token.getSnsEndpointArn());
+                // Map<String, String> attributes = awsSnsService.getEndpointAttributes(token.getSnsEndpointArn());
 
-                if (attributes.isEmpty() || "false".equals(attributes.get("Enabled"))) {
+                if (attributes.isEmpty() || "false".equals("true")) {
                     token.markAsInvalid("SNS endpoint is disabled or not found");
                 } else {
                     token.markAsValid();
