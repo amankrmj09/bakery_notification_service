@@ -2,22 +2,18 @@
 
 This document outlines the REST APIs exposed by the Bakery Notification Service.
 
-## Base URL
-All endpoints are relative to the application's base URL (e.g., `http://localhost:8080`).
-
 ---
 
-## 1. Admin API (`/api/admin`)
+## 1. Admin API
 System administration and monitoring APIs. Requires `ADMIN` or `SYSTEM` roles.
+**Base Path:** `/api/admin`
 
 ### 1.1 Get System Overview
-- **Name:** Get system overview
 - **Method:** `GET`
 - **Path:** `/api/admin/overview`
-- **Headers:** 
-  - `X-User-Id` (optional)
+- **Type of API:** `Admin`
 - **Request Body:** None
-- **Response:** (200 OK)
+- **Response Body:** `200 OK`
   ```json
   {
     "system": {
@@ -36,15 +32,11 @@ System administration and monitoring APIs. Requires `ADMIN` or `SYSTEM` roles.
   ```
 
 ### 1.2 Test Email Service
-- **Name:** Test email service
 - **Method:** `POST`
 - **Path:** `/api/admin/test/email`
-- **Query Parameters:**
-  - `testEmail` (optional) - The email address to send the test email to.
-- **Headers:** 
-  - `X-User-Id` (optional)
+- **Type of API:** `Admin`
 - **Request Body:** None
-- **Response:** (200 OK or 500 Internal Server Error)
+- **Response Body:** `200 OK`
   ```json
   {
     "service": "email",
@@ -57,11 +49,11 @@ System administration and monitoring APIs. Requires `ADMIN` or `SYSTEM` roles.
   ```
 
 ### 1.3 Get Service Health
-- **Name:** Get service health
 - **Method:** `GET`
 - **Path:** `/api/admin/health`
+- **Type of API:** `Admin`
 - **Request Body:** None
-- **Response:** (200 OK or 503 Service Unavailable)
+- **Response Body:** `200 OK`
   ```json
   {
     "system": {
@@ -81,16 +73,15 @@ System administration and monitoring APIs. Requires `ADMIN` or `SYSTEM` roles.
 
 ---
 
-## 2. Notification API (`/api/notifications`)
+## 2. Notification API
 Notification management APIs.
+**Base Path:** `/api/notifications`
 
 ### 2.1 Send an Email Notification
-- **Name:** Send an email notification
 - **Method:** `POST`
 - **Path:** `/api/notifications`
-- **Headers:** 
-  - `X-User-Id` (optional)
-- **Request Body:** `SendNotificationRequestDto`
+- **Type of API:** `Admin`
+- **Request Body:**
   ```json
   {
     "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -104,7 +95,7 @@ Notification management APIs.
     }
   }
   ```
-- **Response:** (201 Created) `NotificationResponseDto`
+- **Response Body:** `201 Created`
   ```json
   {
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -123,12 +114,10 @@ Notification management APIs.
   ```
 
 ### 2.2 Send Bulk Email Notifications
-- **Name:** Send bulk email notifications
 - **Method:** `POST`
 - **Path:** `/api/notifications/bulk`
-- **Headers:** 
-  - `X-User-Id` (optional)
-- **Request Body:** Array of `SendNotificationRequestDto`
+- **Type of API:** `Admin`
+- **Request Body:**
   ```json
   [
     {
@@ -144,7 +133,7 @@ Notification management APIs.
     }
   ]
   ```
-- **Response:** (202 Accepted)
+- **Response Body:** `202 Accepted`
   ```json
   {
     "status": "ACCEPTED",
@@ -154,15 +143,11 @@ Notification management APIs.
   ```
 
 ### 2.3 Get Notification by ID
-- **Name:** Get notification by ID
 - **Method:** `GET`
 - **Path:** `/api/notifications/{notificationId}`
-- **Path Parameters:**
-  - `notificationId` - UUID of the notification.
-- **Headers:** 
-  - `X-User-Id` (optional)
+- **Type of API:** `User`
 - **Request Body:** None
-- **Response:** (200 OK or 404 Not Found) `NotificationResponseDto`
+- **Response Body:** `200 OK`
   ```json
   {
     "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -181,15 +166,11 @@ Notification management APIs.
   ```
 
 ### 2.4 Get Notifications by User
-- **Name:** Get notifications by user
 - **Method:** `GET`
 - **Path:** `/api/notifications/user/{userId}`
-- **Path Parameters:**
-  - `userId` - UUID of the user.
-- **Headers:** 
-  - `X-User-Id` (optional)
+- **Type of API:** `User`
 - **Request Body:** None
-- **Response:** (200 OK) Array of `NotificationResponseDto`
+- **Response Body:** `200 OK`
   ```json
   [
     {
@@ -210,18 +191,11 @@ Notification management APIs.
   ```
 
 ### 2.5 Get Notifications by User with Pagination
-- **Name:** Get notifications by user with pagination
 - **Method:** `GET`
 - **Path:** `/api/notifications/user/{userId}/paginated`
-- **Path Parameters:**
-  - `userId` - UUID of the user.
-- **Query Parameters:**
-  - `page` (default `0`)
-  - `size` (default `20`)
-  - `sortBy` (default `createdAt`)
-  - `sortDir` (default `DESC`)
+- **Type of API:** `User`
 - **Request Body:** None
-- **Response:** (200 OK) Page of `NotificationResponseDto`
+- **Response Body:** `200 OK`
   ```json
   {
     "content": [
@@ -269,11 +243,11 @@ Notification management APIs.
   ```
 
 ### 2.6 Health Check
-- **Name:** Health check
 - **Method:** `GET`
 - **Path:** `/api/notifications/health`
+- **Type of API:** `Public`
 - **Request Body:** None
-- **Response:** (200 OK)
+- **Response Body:** `200 OK`
   ```json
   {
     "status": "UP",
