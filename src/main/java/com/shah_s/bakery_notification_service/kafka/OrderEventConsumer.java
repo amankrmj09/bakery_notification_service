@@ -22,8 +22,8 @@ public class OrderEventConsumer {
         this.templateProperties = templateProperties;
     }
 
-    @KafkaListener(topics = "order-events", groupId = "notification-service-group")
-    public void consume(OrderEvent event) {
+    @KafkaListener(topics = "${kafka.topic.order-events}", groupId = "notification-service-group")
+    public void consumeOrderEvent(OrderEvent event) {
         logger.info("Received OrderEvent for Order ID: {} with status: {}", event.getOrderId(), event.getStatus());
         
         try {

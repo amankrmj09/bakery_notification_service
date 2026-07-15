@@ -22,8 +22,8 @@ public class UserEventConsumer {
         this.templateProperties = templateProperties;
     }
 
-    @KafkaListener(topics = "user-events", groupId = "notification-service-group")
-    public void consume(UserEvent event) {
+    @KafkaListener(topics = "${kafka.topic.user-events}", groupId = "notification-service-group")
+    public void consumeUserEvent(UserEvent event) {
         logger.info("Received UserEvent for User ID: {} with action: {}", event.getUserId(), event.getAction());
         
         try {

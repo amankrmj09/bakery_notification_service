@@ -46,39 +46,23 @@ public class NotificationController {
         logger.info("Sending email notification: recipient={}, requester={}",
                 request.getRecipientEmail(), requestingUserId);
 
-        try {
-            NotificationResponseDto response = notificationService.sendNotification(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            logger.error("Failed to send notification: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        NotificationResponseDto response = notificationService.sendNotification(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Send bulk email notifications")
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or hasRole('MARKETING')")
-    public ResponseEntity<Map<String, Object>> sendBulkNotifications(
+    public ResponseEntity<org.devofblue.common.dto.MessageResponseDto> sendBulkNotifications(
             @Valid @RequestBody List<SendNotificationRequestDto> requests,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
         logger.info("Sending bulk notifications: count={}, requester={}", requests.size(), requestingUserId);
 
-        try {
-            CompletableFuture<List<NotificationResponseDto>> future =
-                    notificationService.sendBulkNotifications(requests);
+        CompletableFuture<List<NotificationResponseDto>> future =
+                notificationService.sendBulkNotifications(requests);
 
-            Map<String, Object> response = Map.of(
-                    "status", "ACCEPTED",
-                    "count", requests.size(),
-                    "message", "Bulk notifications accepted for processing"
-            );
-
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
-        } catch (Exception e) {
-            logger.error("Failed to process bulk notifications: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new org.devofblue.common.dto.MessageResponseDto("Bulk notifications accepted for processing. Count: " + requests.size()));
     }
 
     @Operation(summary = "Get notification by ID")
@@ -88,12 +72,8 @@ public class NotificationController {
             @PathVariable UUID notificationId,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        try {
-            NotificationResponseDto notification = notificationService.getNotificationById(notificationId);
-            return ResponseEntity.ok(notification);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        NotificationResponseDto notification = notificationService.getNotificationById(notificationId);
+        return ResponseEntity.ok(notification);
     }
 
     @Operation(summary = "Get notifications by user")
@@ -103,12 +83,8 @@ public class NotificationController {
             @PathVariable UUID userId,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        try {
-            List<NotificationResponseDto> notifications = notificationService.getNotificationsByUser(userId);
-            return ResponseEntity.ok(notifications);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        List<NotificationResponseDto> notifications = notificationService.getNotificationsByUser(userId);
+        return ResponseEntity.ok(notifications);
     }
 
     @Operation(summary = "Get notifications by user with pagination")
@@ -121,24 +97,14 @@ public class NotificationController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
 
-        try {
-            Page<NotificationResponseDto> notifications = notificationService.getNotificationsByUser(
-                    userId, page, size, sortBy, sortDir);
-            return ResponseEntity.ok(notifications);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Page<NotificationResponseDto> notifications = notificationService.getNotificationsByUser(
+                userId, page, size, sortBy, sortDir);
+        return ResponseEntity.ok(notifications);
     }
 
     @Operation(summary = "Health check")
     @GetMapping("/health")
-    public ResponseEntity<Map<String, Object>> healthCheck() {
-        Map<String, Object> health = Map.of(
-                "status", "UP",
-                "service", "notification-service",
-                "timestamp", LocalDateTime.now(),
-                "version", "1.0.0"
-        );
-        return ResponseEntity.ok(health);
+    public ResponseEntity<org.devofblue.common.dto.HealthResponseDto> healthCheck() {
+        return ResponseEntity.ok(new org.devofblue.common.dto.HealthResponseDto("UP", "notification-service"));
     }
 }

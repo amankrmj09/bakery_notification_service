@@ -22,8 +22,8 @@ public class PaymentEventConsumer {
         this.templateProperties = templateProperties;
     }
 
-    @KafkaListener(topics = "payment-events", groupId = "notification-service-group")
-    public void consume(PaymentEvent event) {
+    @KafkaListener(topics = "${kafka.topic.payment-events}", groupId = "notification-service-group")
+    public void consumePaymentEvent(PaymentEvent event) {
         logger.info("Received PaymentEvent for Payment ID: {} with status: {}", event.getPaymentId(), event.getStatus());
         
         if (!"COMPLETED".equals(event.getStatus()) && !"FAILED".equals(event.getStatus())) {

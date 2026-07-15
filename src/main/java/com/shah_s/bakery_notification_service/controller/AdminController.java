@@ -98,30 +98,24 @@ public class AdminController {
 
     @Operation(summary = "Get service health")
     @GetMapping("/health")
-    public ResponseEntity<Map<String, Object>> getServiceHealth() {
+    public ResponseEntity<org.devofblue.common.dto.HealthResponseDto> getServiceHealth() {
         try {
-            Map<String, Object> health = new HashMap<>();
+            org.devofblue.common.dto.HealthResponseDto health = new org.devofblue.common.dto.HealthResponseDto("UP", applicationName);
 
-            health.put("system", Map.of(
-                    "status", "UP",
-                    "application", applicationName,
-                    "port", serverPort,
-                    "timestamp", LocalDateTime.now()
-            ));
-
+            Map<String, Object> details = new HashMap<>();
+            details.put("port", serverPort);
+            
             Map<String, Object> services = new HashMap<>();
             services.put("email", emailService.getEmailServiceHealth());
-            health.put("services", services);
+            details.put("services", services);
 
-            health.put("overallStatus", "HEALTHY");
-
+            health.setDetails(details);
             return ResponseEntity.ok(health);
         } catch (Exception e) {
-            Map<String, Object> errorHealth = Map.of(
-                    "overallStatus", "DOWN",
-                    "error", e.getMessage(),
-                    "timestamp", LocalDateTime.now()
-                );
+            org.devofblue.common.dto.HealthResponseDto errorHealth = new org.devofblue.common.dto.HealthResponseDto("DOWN", applicationName);
+            Map<String, Object> details = new HashMap<>();
+            details.put("error", e.getMessage());
+            errorHealth.setDetails(details);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorHealth);
         }
     }
