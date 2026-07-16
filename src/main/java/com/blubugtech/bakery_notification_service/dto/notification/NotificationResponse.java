@@ -1,11 +1,11 @@
-package com.blubugtech.bakery_notification_service.dto;
+package com.blubugtech.bakery_notification_service.dto.notification;
 
 import com.blubugtech.bakery_notification_service.entity.Notification;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class NotificationResponseDto {
+public class NotificationResponse {
     private UUID id;
     private UUID userId;
     private String recipientEmail;
@@ -19,8 +19,8 @@ public class NotificationResponseDto {
     private LocalDateTime updatedAt;
     private LocalDateTime sentAt;
 
-    public static NotificationResponseDto from(Notification notification) {
-        NotificationResponseDto response = new NotificationResponseDto();
+    public static NotificationResponse from(Notification notification) {
+        NotificationResponse response = new NotificationResponse();
         response.id = notification.getId();
         response.userId = notification.getUserId();
         response.recipientEmail = notification.getRecipientEmail();

@@ -2,6 +2,7 @@ package com.blubugtech.bakery_notification_service.controller;
 
 import com.blubugtech.bakery_notification_service.service.EmailService;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
+import com.blubugtech.common.contract.feign.HealthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -98,13 +99,13 @@ public class AdminController {
 
     @Operation(summary = "Get service health")
     @GetMapping("/health")
-    public ResponseEntity<com.blubugtech.common.dto.HealthResponseDto> getServiceHealth() {
+    public ResponseEntity<HealthResponse> getServiceHealth() {
         try {
-            com.blubugtech.common.dto.HealthResponseDto health = new com.blubugtech.common.dto.HealthResponseDto("UP", applicationName);
+             HealthResponse health = new  HealthResponse("UP", applicationName);
 
             Map<String, Object> details = new HashMap<>();
             details.put("port", serverPort);
-            
+
             Map<String, Object> services = new HashMap<>();
             services.put("email", emailService.getEmailServiceHealth());
             details.put("services", services);
@@ -112,7 +113,7 @@ public class AdminController {
             health.setDetails(details);
             return ResponseEntity.ok(health);
         } catch (Exception e) {
-            com.blubugtech.common.dto.HealthResponseDto errorHealth = new com.blubugtech.common.dto.HealthResponseDto("DOWN", applicationName);
+             HealthResponse errorHealth = new  HealthResponse("DOWN", applicationName);
             Map<String, Object> details = new HashMap<>();
             details.put("error", e.getMessage());
             errorHealth.setDetails(details);

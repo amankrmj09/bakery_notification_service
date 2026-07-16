@@ -1,10 +1,10 @@
-package com.blubugtech.bakery_notification_service.dto;
+package com.blubugtech.bakery_notification_service.dto.notification;
 
 import jakarta.validation.constraints.*;
 
 import java.util.UUID;
 
-public class SendNotificationRequestDto {
+public class SendNotificationRequest {
 
     private UUID userId;
 
@@ -27,16 +27,16 @@ public class SendNotificationRequestDto {
 
     private java.util.Map<String, Object> params;
 
-    public SendNotificationRequestDto() {}
+    public SendNotificationRequest() {}
 
-    public SendNotificationRequestDto(String recipientEmail, String title, String content) {
+    public SendNotificationRequest(String recipientEmail, String title, String content) {
         this.recipientEmail = recipientEmail;
         this.title = title;
         this.content = content;
     }
 
-    public static SendNotificationRequestDto email(String recipientEmail, String title, String content) {
-        return new SendNotificationRequestDto(recipientEmail, title, content);
+    public static SendNotificationRequest email(String recipientEmail, String title, String content) {
+        return new SendNotificationRequest(recipientEmail, title, content);
     }
 
     // Getters and Setters

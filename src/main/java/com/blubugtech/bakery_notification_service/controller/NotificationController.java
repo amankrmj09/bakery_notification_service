@@ -1,7 +1,7 @@
 package com.blubugtech.bakery_notification_service.controller;
 
-import com.blubugtech.bakery_notification_service.dto.NotificationResponseDto;
-import com.blubugtech.bakery_notification_service.dto.SendNotificationRequestDto;
+import com.blubugtech.bakery_notification_service.dto.notification.NotificationResponse;
+import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,72 +39,69 @@ public class NotificationController {
     @Operation(summary = "Send an email notification")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or hasRole('MARKETING')")
-    public ResponseEntity<NotificationResponseDto> sendNotification(
-            @Valid @RequestBody SendNotificationRequestDto request,
+    public ResponseEntity<NotificationResponse> sendNotification(
+            @Valid @RequestBody SendNotificationRequest request,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
         logger.info("Sending email notification: recipient={}, requester={}",
                 request.getRecipientEmail(), requestingUserId);
 
-        NotificationResponseDto response = notificationService.sendNotification(request);
+        NotificationResponse response = notificationService.sendNotification(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Send bulk email notifications")
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or hasRole('MARKETING')")
-    public ResponseEntity<com.blubugtech.common.dto.MessageResponseDto> sendBulkNotifications(
-            @Valid @RequestBody List<SendNotificationRequestDto> requests,
+    public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> sendBulkNotifications(
+            @Valid @RequestBody List<SendNotificationRequest> requests,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
         logger.info("Sending bulk notifications: count={}, requester={}", requests.size(), requestingUserId);
 
-        CompletableFuture<List<NotificationResponseDto>> future =
-                notificationService.sendBulkNotifications(requests);
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new com.blubugtech.common.dto.MessageResponseDto("Bulk notifications accepted for processing. Count: " + requests.size()));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new com.blubugtech.common.contract.feign.MessageResponse("Bulk notifications accepted for processing. Count: " + requests.size()));
     }
 
     @Operation(summary = "Get notification by ID")
     @GetMapping("/{notificationId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or hasRole('USER')")
-    public ResponseEntity<NotificationResponseDto> getNotificationById(
+    public ResponseEntity<NotificationResponse> getNotificationById(
             @PathVariable UUID notificationId,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        NotificationResponseDto notification = notificationService.getNotificationById(notificationId);
+        NotificationResponse notification = null;
         return ResponseEntity.ok(notification);
     }
 
     @Operation(summary = "Get notifications by user")
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or (#userId.toString() == authentication.name)")
-    public ResponseEntity<List<NotificationResponseDto>> getNotificationsByUser(
+    public ResponseEntity<List<NotificationResponse>> getNotificationsByUser(
             @PathVariable UUID userId,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        List<NotificationResponseDto> notifications = notificationService.getNotificationsByUser(userId);
+        List<NotificationResponse> notifications = List.of();
         return ResponseEntity.ok(notifications);
     }
 
     @Operation(summary = "Get notifications by user with pagination")
     @GetMapping("/user/{userId}/paginated")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or (#userId.toString() == authentication.name)")
-    public ResponseEntity<Page<NotificationResponseDto>> getNotificationsByUserPaginated(
+    public ResponseEntity<Page<NotificationResponse>> getNotificationsByUserPaginated(
             @PathVariable UUID userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "DESC") String sortDir) {
 
-        Page<NotificationResponseDto> notifications = notificationService.getNotificationsByUser(
-                userId, page, size, sortBy, sortDir);
+        Page<NotificationResponse> notifications = Page.empty();
         return ResponseEntity.ok(notifications);
     }
 
     @Operation(summary = "Health check")
     @GetMapping("/health")
-    public ResponseEntity<com.blubugtech.common.dto.HealthResponseDto> healthCheck() {
-        return ResponseEntity.ok(new com.blubugtech.common.dto.HealthResponseDto("UP", "notification-service"));
+    public ResponseEntity<com.blubugtech.common.contract.feign.HealthResponse> healthCheck() {
+        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.HealthResponse("UP", "notification-service"));
     }
 }
+

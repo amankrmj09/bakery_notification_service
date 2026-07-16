@@ -11,7 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.blubugtech.common.exception.ErrorResponseDto;
+import com.blubugtech.common.exception.handler.ErrorResponse;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.blubugtech.common.exception.BaseExceptionHandler;
+import com.blubugtech.common.exception.handler.BaseExceptionHandler;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends BaseExceptionHandler {
@@ -27,12 +27,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(NotificationServiceException.class)
-    public ResponseEntity<ErrorResponseDto> handleNotificationServiceException(
+    public ResponseEntity<ErrorResponse> handleNotificationServiceException(
             NotificationServiceException ex, WebRequest request) {
 
         logger.error("Notification service error: {}", ex.getMessage());
 
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
+        ErrorResponse errorResponse = new ErrorResponse(
             "NOTIFICATION_SERVICE_ERROR",
             ex.getMessage(),
             LocalDateTime.now(),
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponseDto> handleConstraintViolationException(
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(
             ConstraintViolationException ex, WebRequest request) {
 
         logger.error("Constraint violation error: {}", ex.getMessage());
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
             validationErrors.put(fieldName, errorMessage);
         }
 
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
+        ErrorResponse errorResponse = new ErrorResponse(
             "CONSTRAINT_VIOLATION",
             "Constraint violation in request data",
             LocalDateTime.now(),
@@ -68,12 +68,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponseDto> handleHttpMessageNotReadableException(
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex, WebRequest request) {
 
         logger.error("HTTP message not readable: {}", ex.getMessage());
 
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
+        ErrorResponse errorResponse = new ErrorResponse(
             "MALFORMED_REQUEST",
             "Malformed JSON request",
             LocalDateTime.now(),
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponseDto> handleMethodArgumentTypeMismatchException(
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
 
         logger.error("Method argument type mismatch: {}", ex.getMessage());
@@ -93,7 +93,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
         String message = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s",
                                      ex.getValue(), ex.getName(), ex.getRequiredType().getSimpleName());
 
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
+        ErrorResponse errorResponse = new ErrorResponse(
             "INVALID_PARAMETER_TYPE",
             message,
             LocalDateTime.now(),
@@ -105,14 +105,14 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponseDto> handleMissingServletRequestParameterException(
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
             MissingServletRequestParameterException ex, WebRequest request) {
 
         logger.error("Missing request parameter: {}", ex.getMessage());
 
         String message = String.format("Missing required parameter: %s", ex.getParameterName());
 
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
+        ErrorResponse errorResponse = new ErrorResponse(
             "MISSING_PARAMETER",
             message,
             LocalDateTime.now(),
@@ -124,12 +124,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(
             AccessDeniedException ex, WebRequest request) {
 
         logger.error("Access denied: {}", ex.getMessage());
 
-        ErrorResponseDto errorResponse = new ErrorResponseDto(
+        ErrorResponse errorResponse = new ErrorResponse(
             "ACCESS_DENIED",
             "Access denied - insufficient permissions",
             LocalDateTime.now(),

@@ -30,6 +30,9 @@ repositories {
 extra["springCloudVersion"] = "2025.0.3"
 
 dependencies {
+	implementation("org.mapstruct:mapstruct:1.5.5.Final")
+	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 	// 1. Shared Custom Libraries
 	implementation("org.blubugtech.com:common-libs:2.0.0")
 

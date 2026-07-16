@@ -1,4 +1,4 @@
-package com.blubugtech.bakery_notification_service.dto;
+package com.blubugtech.bakery_notification_service.dto.device;
 
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class DeviceRegistrationRequestDto {
+public class DeviceRegistrationRequest {
 
     // Getters and Setters
     private UUID userId; // NULL for guest registration
@@ -60,14 +60,14 @@ public class DeviceRegistrationRequestDto {
     private Map<String, Object> metadata;
 
     // Constructors
-    public DeviceRegistrationRequestDto() {}
+    public DeviceRegistrationRequest() {}
 
-    public DeviceRegistrationRequestDto(String deviceToken, String platform) {
+    public DeviceRegistrationRequest(String deviceToken, String platform) {
         this.deviceToken = deviceToken;
         this.platform = platform;
     }
 
-    public DeviceRegistrationRequestDto(UUID userId, String deviceToken, String platform) {
+    public DeviceRegistrationRequest(UUID userId, String deviceToken, String platform) {
         this(deviceToken, platform);
         this.userId = userId;
     }

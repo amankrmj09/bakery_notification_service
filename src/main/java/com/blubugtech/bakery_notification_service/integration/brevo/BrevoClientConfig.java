@@ -1,6 +1,6 @@
-package com.blubugtech.bakery_notification_service.config;
+package com.blubugtech.bakery_notification_service.integration.brevo;
 
-import com.blubugtech.bakery_notification_service.client.BrevoEmailClient;
+import com.blubugtech.bakery_notification_service.integration.brevo.BrevoEmailClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;

@@ -1,7 +1,7 @@
-package com.blubugtech.bakery_notification_service.client;
+package com.blubugtech.bakery_notification_service.integration.brevo;
 
-import com.blubugtech.bakery_notification_service.dto.BrevoEmailDto.BrevoEmailResponse;
-import com.blubugtech.bakery_notification_service.dto.BrevoEmailDto.BrevoTemplateEmailRequest;
+import com.blubugtech.bakery_notification_service.dto.email.BrevoEmailResponse;
+import com.blubugtech.bakery_notification_service.dto.email.BrevoEmailRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -15,6 +15,6 @@ public interface BrevoEmailClient {
     @PostExchange(value = "/smtp/email", accept = "application/json", contentType = "application/json")
     Mono<ResponseEntity<BrevoEmailResponse>> sendTemplateEmail(
             @RequestHeader("api-key") String apiKey,
-            @RequestBody BrevoTemplateEmailRequest request
+            @RequestBody BrevoEmailRequest request
     );
 }
