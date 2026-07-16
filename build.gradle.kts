@@ -30,42 +30,57 @@ repositories {
 extra["springCloudVersion"] = "2025.0.3"
 
 dependencies {
+	// 1. Shared Custom Libraries
 	implementation("org.blubugtech.com:common-libs:2.0.0")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-rest")
-    implementation("org.springframework.boot:spring-boot-starter-security")
 
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-    implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+	// 2. Spring Boot Core & Web
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-data-rest")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("org.springframework.boot:spring-boot-starter-cache")
 
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation("org.springframework.retry:spring-retry")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
-    implementation("org.springframework.kafka:spring-kafka")
-    compileOnly("org.projectlombok:lombok")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
-    runtimeOnly("com.h2database:h2")
-    // runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    runtimeOnly("org.postgresql:postgresql")
-    annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    // testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("io.projectreactor:reactor-test")
-    // testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-    testImplementation("org.springframework.security:spring-security-test")
-    // testImplementation("org.testcontainers:junit-jupiter")
-    // testImplementation("org.testcontainers:postgresql")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	// 3. Spring Cloud & Discovery
+	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+	implementation("org.springframework.cloud:spring-cloud-starter-config")
+
+	// 4. Data & Persistence
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.flywaydb:flyway-core")
 	implementation("org.flywaydb:flyway-database-postgresql")
+	runtimeOnly("org.postgresql:postgresql")
+	runtimeOnly("com.h2database:h2")
+
+	// 5. Messaging & Event Driven
+	implementation("org.springframework.kafka:spring-kafka")
+
+	// 6. Security
+	implementation("org.springframework.boot:spring-boot-starter-security")
+
+	// 7. Third-Party Utilities (Jackson, AWS, etc.)
+	implementation("com.fasterxml.jackson.core:jackson-databind")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+	implementation("org.springframework.retry:spring-retry")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+
+	// 8. Tooling & Lombok
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+	// runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
+	// 9. Testing
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("io.projectreactor:reactor-test")
+	testImplementation("org.springframework.security:spring-security-test")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	// testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	// testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+	// testImplementation("org.testcontainers:junit-jupiter")
+	// testImplementation("org.testcontainers:postgresql")
 }
 
 dependencyManagement {
