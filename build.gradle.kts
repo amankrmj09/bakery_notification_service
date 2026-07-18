@@ -34,7 +34,7 @@ dependencies {
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 	// 1. Shared Custom Libraries
-	implementation("org.blubugtech.com:common-libs:2.0.2")
+	implementation("org.blubugtech.com:common-libs:2.0.3")
 
 	// 2. Spring Boot Core & Web
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
