@@ -4,34 +4,36 @@ This document outlines the REST APIs exposed by the Bakery Notification Service.
 
 ---
 
+## System & Monitoring (Actuator)
+**Base Path:** `/actuator`
+
+Standard Spring Boot Actuator endpoints are used for monitoring and metrics.
+
+### 1. Health Check
+- **Method:** `GET`
+- **Path:** `/actuator/health`
+- **Type of API:** `Public`
+- **Response Body:** `200 OK` (Standard Actuator Health JSON)
+
+### 2. Service Info
+- **Method:** `GET`
+- **Path:** `/actuator/info`
+- **Type of API:** `Public`
+- **Response Body:** `200 OK` (Standard Actuator Info JSON)
+
+### 3. Prometheus Metrics
+- **Method:** `GET`
+- **Path:** `/actuator/prometheus`
+- **Type of API:** `Public`
+- **Response Body:** `200 OK` (Prometheus Text Format)
+
+---
+
 ## 1. Admin API
 System administration and monitoring APIs. Requires `ADMIN` or `SYSTEM` roles.
 **Base Path:** `/api/admin`
 
-### 1.1 Get System Overview
-- **Method:** `GET`
-- **Path:** `/api/admin/overview`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "system": {
-      "applicationName": "bakery-notification-service",
-      "serverPort": "8080",
-      "timestamp": "2026-07-13T12:00:00",
-      "version": "1.0.0",
-      "environment": "production"
-    },
-    "serviceHealth": {
-      "email": {
-        // Detailed health status of email service
-      }
-    }
-  }
-  ```
-
-### 1.2 Test Email Service
+### 1.1 Test Email Service
 - **Method:** `POST`
 - **Path:** `/api/admin/test/email`
 - **Type of API:** `Admin`
@@ -48,28 +50,7 @@ System administration and monitoring APIs. Requires `ADMIN` or `SYSTEM` roles.
   }
   ```
 
-### 1.3 Get Service Health
-- **Method:** `GET`
-- **Path:** `/api/admin/health`
-- **Type of API:** `Admin`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "system": {
-      "status": "UP",
-      "application": "bakery-notification-service",
-      "port": "8080",
-      "timestamp": "2026-07-13T12:00:00"
-    },
-    "services": {
-      "email": {
-        // Detailed health status of email service
-      }
-    },
-    "overallStatus": "HEALTHY"
-  }
-  ```
+
 
 ---
 
@@ -80,7 +61,7 @@ Notification management APIs.
 ### 2.1 Send an Email Notification
 - **Method:** `POST`
 - **Path:** `/api/notifications`
-- **Type of API:** `Admin`
+- **Type of API:** `Admin/System/Marketing`
 - **Request Body:**
   ```json
   {
@@ -116,7 +97,7 @@ Notification management APIs.
 ### 2.2 Send Bulk Email Notifications
 - **Method:** `POST`
 - **Path:** `/api/notifications/bulk`
-- **Type of API:** `Admin`
+- **Type of API:** `Admin/System/Marketing`
 - **Request Body:**
   ```json
   [
@@ -136,16 +117,14 @@ Notification management APIs.
 - **Response Body:** `202 Accepted`
   ```json
   {
-    "status": "ACCEPTED",
-    "count": 1,
-    "message": "Bulk notifications accepted for processing"
+    "message": "Bulk notifications accepted for processing. Count: 1"
   }
   ```
 
 ### 2.3 Get Notification by ID
 - **Method:** `GET`
 - **Path:** `/api/notifications/{notificationId}`
-- **Type of API:** `User`
+- **Type of API:** `Admin/System/User`
 - **Request Body:** None
 - **Response Body:** `200 OK`
   ```json
@@ -168,7 +147,7 @@ Notification management APIs.
 ### 2.4 Get Notifications by User
 - **Method:** `GET`
 - **Path:** `/api/notifications/user/{userId}`
-- **Type of API:** `User`
+- **Type of API:** `Admin/System/User`
 - **Request Body:** None
 - **Response Body:** `200 OK`
   ```json
@@ -193,7 +172,7 @@ Notification management APIs.
 ### 2.5 Get Notifications by User with Pagination
 - **Method:** `GET`
 - **Path:** `/api/notifications/user/{userId}/paginated`
-- **Type of API:** `User`
+- **Type of API:** `Admin/System/User`
 - **Request Body:** None
 - **Response Body:** `200 OK`
   ```json
@@ -242,17 +221,4 @@ Notification management APIs.
   }
   ```
 
-### 2.6 Health Check
-- **Method:** `GET`
-- **Path:** `/api/notifications/health`
-- **Type of API:** `Public`
-- **Request Body:** None
-- **Response Body:** `200 OK`
-  ```json
-  {
-    "status": "UP",
-    "service": "notification-service",
-    "timestamp": "2026-07-13T12:00:00",
-    "version": "1.0.0"
-  }
-  ```
+

@@ -42,27 +42,7 @@ public class AdminController {
     @Value("${server.port:8080}")
     private String serverPort;
 
-    @Operation(summary = "Get system overview")
-    @GetMapping("/overview")
-    public ResponseEntity<Map<String, Object>> getSystemOverview(
-            @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        logger.info("Getting system overview: requester={}", requestingUserId);
-
-        Map<String, Object> overview = new HashMap<>();
-
-        overview.put("system", Map.of(
-                "applicationName", applicationName,
-                "serverPort", serverPort,
-                "timestamp", LocalDateTime.now(),
-                "version", "1.0.0",
-                "environment", "production"
-        ));
-
-        overview.put("serviceHealth", Map.of("email", emailService.getEmailServiceHealth()));
-
-        return ResponseEntity.ok(overview);
-    }
 
     @Operation(summary = "Test email service")
     @PostMapping("/test/email")
@@ -97,27 +77,5 @@ public class AdminController {
         }
     }
 
-    @Operation(summary = "Get service health")
-    @GetMapping("/health")
-    public ResponseEntity<HealthResponse> getServiceHealth() {
-        try {
-             HealthResponse health = new  HealthResponse("UP", applicationName);
 
-            Map<String, Object> details = new HashMap<>();
-            details.put("port", serverPort);
-
-            Map<String, Object> services = new HashMap<>();
-            services.put("email", emailService.getEmailServiceHealth());
-            details.put("services", services);
-
-            health.setDetails(details);
-            return ResponseEntity.ok(health);
-        } catch (Exception e) {
-             HealthResponse errorHealth = new  HealthResponse("DOWN", applicationName);
-            Map<String, Object> details = new HashMap<>();
-            details.put("error", e.getMessage());
-            errorHealth.setDetails(details);
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorHealth);
-        }
-    }
 }

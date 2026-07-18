@@ -98,10 +98,5 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    @Operation(summary = "Health check")
-    @GetMapping("/health")
-    public ResponseEntity<com.blubugtech.common.contract.feign.HealthResponse> healthCheck() {
-        return ResponseEntity.ok(new com.blubugtech.common.contract.feign.HealthResponse("UP", "notification-service"));
-    }
 }
 
