@@ -46,8 +46,8 @@ public class BrevoEmailSender implements EmailSender {
                 message.getParams()
             );
             
-            // BrevoEmailClient is reactive (WebClient), assuming it returns Mono<ResponseEntity<BrevoEmailResponse>>
-            BrevoEmailResponse response = brevoEmailClient.sendTemplateEmail(brevoProperties.getApiKey(), request).block().getBody();
+            // BrevoEmailClient uses RestClient (synchronous)
+            BrevoEmailResponse response = brevoEmailClient.sendTemplateEmail(brevoProperties.getApiKey(), request).getBody();
 
             return NotificationResult.builder()
                     .success(true)
