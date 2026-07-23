@@ -1,0 +1,2 @@
+ALTER TABLE notifications ALTER COLUMN type DROP NOT NULL;
+ALTER TABLE notifications ALTER COLUMN priority DROP NOT NULL;
