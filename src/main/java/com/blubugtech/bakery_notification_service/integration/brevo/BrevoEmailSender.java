@@ -29,13 +29,20 @@ public class BrevoEmailSender implements EmailSender {
     public NotificationResult send(EmailMessage message) {
         logger.info("Sending email via Brevo to: {}", message.getTo());
         try {
+            Long templateId = null;
+            if (message.getTemplateName() != null) {
+                try {
+                    templateId = Long.parseLong(message.getTemplateName());
+                } catch (NumberFormatException ignored) {}
+            }
+
             BrevoEmailRequest request = new BrevoEmailRequest(
-                new BrevoParticipant(brevoProperties.getSenderName(), brevoProperties.getFrom()),
+                null, // sender can be null for template emails in Brevo
                 List.of(new BrevoParticipant(null, message.getTo())),
                 message.getSubject(),
                 message.getHtmlContent(),
                 null,
-                null,
+                templateId,
                 message.getParams()
             );
             
