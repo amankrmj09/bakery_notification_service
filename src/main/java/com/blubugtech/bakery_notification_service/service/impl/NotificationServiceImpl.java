@@ -55,15 +55,12 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         Notification notification = new Notification();
-        notification.setId(UUID.randomUUID());
         notification.setRecipientEmail(request.getRecipientEmail());
         notification.setRecipientName(request.getRecipientName());
         notification.setTitle(request.getTitle());
         notification.setContent(request.getContent());
 
         notification.setStatus(com.blubugtech.bakery_notification_service.entity.Notification.NotificationStatus.PENDING);
-        notification.setCreatedAt(LocalDateTime.now());
-        notification.setUpdatedAt(LocalDateTime.now());
 
         notification = notificationRepository.save(notification);
 
