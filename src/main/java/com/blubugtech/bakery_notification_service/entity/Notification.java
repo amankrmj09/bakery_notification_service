@@ -40,7 +40,6 @@ public class Notification {
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    @NotBlank(message = "Content is required")
     private String content;
 
     @Column(name = "email_message_id", length = 255)
