@@ -7,6 +7,7 @@ import com.blubugtech.common.event.PaymentEvent;
 import com.blubugtech.common.contract.messaging.PaymentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.blubugtech.common.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class PaymentEventConsumer {
         this.notificationFactory = notificationFactory;
     }
 
-    @KafkaListener(topics = "payment-events", groupId = "notification-group")
+    @KafkaListener(topics = KafkaTopics.PAYMENTS_TOPIC, groupId = "notification-group")
     public void consume(PaymentEvent event) {
         PaymentPayload payload = event.getPayload();
         logger.info("Received PaymentEvent for Payment ID: {} with status: {}", payload.getPaymentId(), payload.getStatus());

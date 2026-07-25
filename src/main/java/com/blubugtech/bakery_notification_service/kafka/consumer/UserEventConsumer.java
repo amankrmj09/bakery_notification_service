@@ -7,6 +7,7 @@ import com.blubugtech.common.event.UserEvent;
 import com.blubugtech.common.contract.messaging.UserPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.blubugtech.common.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class UserEventConsumer {
         this.notificationFactory = notificationFactory;
     }
 
-    @KafkaListener(topics = "user-events", groupId = "notification-group")
+    @KafkaListener(topics = KafkaTopics.USER_EVENTS, groupId = "notification-group")
     public void consume(UserEvent event) {
         UserPayload payload = event.getPayload();
         logger.info("Received UserEvent for User ID: {} with action: {}", payload.getUserId(), payload.getAction());

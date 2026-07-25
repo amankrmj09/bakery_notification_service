@@ -7,6 +7,7 @@ import com.blubugtech.common.event.OrderEvent;
 import com.blubugtech.common.contract.messaging.OrderPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.blubugtech.common.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class OrderEventConsumer {
         this.notificationFactory = notificationFactory;
     }
 
-    @KafkaListener(topics = "order-events", groupId = "notification-group")
+    @KafkaListener(topics = KafkaTopics.ORDERS_TOPIC, groupId = "notification-group")
     public void consume(OrderEvent event) {
         OrderPayload payload = event.getPayload();
         logger.info("Received OrderEvent for Order ID: {} with status: {}", payload.getOrderId(), payload.getStatus());
