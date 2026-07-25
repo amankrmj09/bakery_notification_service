@@ -65,10 +65,16 @@ public class BrevoTemplateProperties {
     public static class FeedbackProperties {
         private Long general;
         private Long review;
+        private Long testimonial;
+        private Long contactUs;
 
         public Long getGeneral() { return general; }
         public void setGeneral(Long general) { this.general = general; }
         public Long getReview() { return review; }
         public void setReview(Long review) { this.review = review; }
+        public Long getTestimonial() { return testimonial; }
+        public void setTestimonial(Long testimonial) { this.testimonial = testimonial; }
+        public Long getContactUs() { return contactUs; }
+        public void setContactUs(Long contactUs) { this.contactUs = contactUs; }
     }
 }

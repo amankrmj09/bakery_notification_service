@@ -55,6 +55,15 @@ public class FeedbackNotificationBuilder extends BaseNotificationBuilder<Feedbac
                 request.getParams().put("productName", payload.getProductName());
                 request.getParams().put("rating", payload.getRating());
                 break;
+            case "TESTIMONIAL":
+                request.setTemplateId(props.getFeedback().getTestimonial());
+                request.setTitle("Thank You For Your Testimonial");
+                break;
+            case "CONTACT_US":
+                request.setTemplateId(props.getFeedback().getContactUs());
+                request.setTitle("We've Received Your Message");
+                request.getParams().put("ticketId", payload.getTicketId());
+                break;
             default:
                 return false;
         }
