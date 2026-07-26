@@ -41,9 +41,11 @@ public class SmsNotificationSender implements NotificationSender {
         logger.info("Sending SMS Notification to: {}", request.getRecipientPhone());
         
         try {
+            String formattedPhone = request.getRecipientPhone() != null ? request.getRecipientPhone().replaceAll("[^0-9]", "") : "";
+            
             BrevoSmsRequest smsRequest = BrevoSmsRequest.builder()
                 .sender(senderName)
-                .recipient(request.getRecipientPhone())
+                .recipient(formattedPhone)
                 .content(request.getSmsContent() != null ? request.getSmsContent() : request.getBody())
                 .type("transactional")
                 .tag(request.getSmsTag())
