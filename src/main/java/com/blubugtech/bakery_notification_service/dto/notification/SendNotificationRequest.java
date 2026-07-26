@@ -23,6 +23,11 @@ public class SendNotificationRequest {
     @NotBlank(message = "Content is required")
     private String content;
 
+    private String recipientPhone;
+    private String smsContent;
+    private String smsTag;
+    private java.util.Set<com.blubugtech.bakery_notification_service.enums.NotificationChannel> channels;
+
     private Long templateId;
 
     private java.util.Map<String, Object> params;
@@ -54,4 +59,13 @@ public class SendNotificationRequest {
     public void setTemplateId(Long templateId) { this.templateId = templateId; }
     public java.util.Map<String, Object> getParams() { return params; }
     public void setParams(java.util.Map<String, Object> params) { this.params = params; }
+    
+    public String getRecipientPhone() { return recipientPhone; }
+    public void setRecipientPhone(String recipientPhone) { this.recipientPhone = recipientPhone; }
+    public String getSmsContent() { return smsContent; }
+    public void setSmsContent(String smsContent) { this.smsContent = smsContent; }
+    public String getSmsTag() { return smsTag; }
+    public void setSmsTag(String smsTag) { this.smsTag = smsTag; }
+    public java.util.Set<com.blubugtech.bakery_notification_service.enums.NotificationChannel> getChannels() { return channels; }
+    public void setChannels(java.util.Set<com.blubugtech.bakery_notification_service.enums.NotificationChannel> channels) { this.channels = channels; }
 }

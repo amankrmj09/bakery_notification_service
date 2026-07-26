@@ -28,6 +28,9 @@ public class Notification {
     @NotBlank(message = "Recipient email is required")
     private String recipientEmail;
 
+    @Column(name = "recipient_phone", length = 20)
+    private String recipientPhone;
+
     @Column(name = "recipient_name", length = 100)
     private String recipientName;
 
@@ -44,6 +47,9 @@ public class Notification {
 
     @Column(name = "email_message_id", length = 255)
     private String emailMessageId;
+
+    @Column(name = "sms_message_id", length = 255)
+    private String smsMessageId;
 
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
@@ -100,6 +106,10 @@ public class Notification {
     public void setContent(String content) { this.content = content; }
     public String getEmailMessageId() { return emailMessageId; }
     public void setEmailMessageId(String emailMessageId) { this.emailMessageId = emailMessageId; }
+    public String getSmsMessageId() { return smsMessageId; }
+    public void setSmsMessageId(String smsMessageId) { this.smsMessageId = smsMessageId; }
+    public String getRecipientPhone() { return recipientPhone; }
+    public void setRecipientPhone(String recipientPhone) { this.recipientPhone = recipientPhone; }
     public String getErrorMessage() { return errorMessage; }
     public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
     public LocalDateTime getCreatedAt() { return createdAt; }

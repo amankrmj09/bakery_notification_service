@@ -16,4 +16,11 @@ public class BrevoClientConfig {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient)).build();
         return factory.createClient(BrevoEmailClient.class);
     }
+
+    @Bean
+    public BrevoSmsClient brevoSmsClient(RestClient.Builder restClientBuilder) {
+        RestClient restClient = restClientBuilder.build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient)).build();
+        return factory.createClient(BrevoSmsClient.class);
+    }
 }

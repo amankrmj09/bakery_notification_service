@@ -14,12 +14,15 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 brevo:
   api-key: your-brevo-api-key
+  sms:
+    sender: "BlusBakery"
+    organisation-prefix: "BlusBakery"
 notification:
   email:
     enabled: ${EMAIL_ENABLED}
     from: noreply@shahs-bakery.com
     reply-to: support@shahs-bakery.com
   sms:
-    enabled: false
+    enabled: ${SMS_ENABLED:false}
   push:
     enabled: false

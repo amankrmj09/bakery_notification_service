@@ -12,11 +12,18 @@ eureka:
       defaultZone: ${EUREKA_URL}
 brevo:
   api-key: ${BREVO_API_KEY}
+  sms:
+    sender: "BlusBakery"
+    organisation-prefix: "BlusBakery"
 notification:
   email:
     enabled: ${EMAIL_ENABLED}
     from: ${NOTIFICATION_FROM_EMAIL}
     reply-to: ${NOTIFICATION_REPLY_TO}
+  sms:
+    enabled: ${SMS_ENABLED:false}
+  push:
+    enabled: false
 
   jpa:
     properties:

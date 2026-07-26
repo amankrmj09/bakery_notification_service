@@ -26,6 +26,11 @@ public class OrderNotificationBuilder extends BaseNotificationBuilder<OrderPaylo
     }
 
     @Override
+    protected String extractPhone(OrderPayload payload) {
+        return null; // Add if available in OrderPayload
+    }
+
+    @Override
     protected String extractName(OrderPayload payload) {
         return "Customer";
     }

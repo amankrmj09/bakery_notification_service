@@ -26,6 +26,11 @@ public class FeedbackNotificationBuilder extends BaseNotificationBuilder<Feedbac
     }
 
     @Override
+    protected String extractPhone(FeedbackPayload payload) {
+        return null; // Add if available in FeedbackPayload
+    }
+
+    @Override
     protected String extractName(FeedbackPayload payload) {
         return payload.getFirstName() != null ? payload.getFirstName() : "Customer";
     }

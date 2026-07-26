@@ -9,9 +9,12 @@ import java.util.Map;
 @Builder
 public class NotificationRequest {
     private String recipient;
+    private String recipientPhone;
     private String title;
     private String body;
-    private NotificationChannel channel;
+    private String smsContent;
+    private String smsTag;
+    private java.util.Set<NotificationChannel> channels;
     private String templateName;
     private Map<String, Object> data;
 }

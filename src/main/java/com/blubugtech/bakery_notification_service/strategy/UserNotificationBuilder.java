@@ -36,8 +36,17 @@ public class UserNotificationBuilder extends BaseNotificationBuilder<UserPayload
     }
 
     @Override
+    protected String extractPhone(UserPayload payload) {
+        return payload.getPhoneNumber();
+    }
+
+    @Override
     protected boolean applySpecifics(UserPayload payload, SendNotificationRequest request) {
         request.getParams().put("firstName", payload.getFirstName());
+        request.getChannels().add(com.blubugtech.bakery_notification_service.enums.NotificationChannel.EMAIL);
+        if (payload.getPhoneNumber() != null && !payload.getPhoneNumber().trim().isEmpty()) {
+            request.getChannels().add(com.blubugtech.bakery_notification_service.enums.NotificationChannel.SMS);
+        }
 
         if (payload.getAction() == null) {
             return false;
@@ -52,12 +61,16 @@ public class UserNotificationBuilder extends BaseNotificationBuilder<UserPayload
             case "PASSWORD_CHANGED":
                 request.setTemplateId(props.getAuth().getPasswordChange());
                 request.setTitle("Security Alert - Password Changed");
+                request.setSmsTag("ACCOUNT_ALERT");
+                request.setSmsContent("Your password was recently changed. If this wasn't you, please contact support.");
                 break;
             case "OTP_REQUESTED":
                 request.setTemplateId(props.getAuth().getOtp());
                 request.setTitle("Your OTP Code");
                 request.getParams().put("otpCode", payload.getOtpCode());
                 request.getParams().put("expiryMinutes", payload.getExpiryMinutes());
+                request.setSmsTag("OTP_REQUEST");
+                request.setSmsContent("Enter this code: " + payload.getOtpCode() + " to validate your account");
                 break;
             case "NEW_SIGN_IN":
                 request.setTemplateId(props.getAuth().getNewSignIn());
