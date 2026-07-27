@@ -67,6 +67,11 @@ public class OrderNotificationBuilder extends BaseNotificationBuilder<OrderPaylo
                 request.setTitle("Order Delivered");
                 request.getParams().put("deliveryAddress", payload.getDeliveryAddress());
                 break;
+            case "CANCELLED":
+                request.setTemplateId(props.getOrder().getAdminCancelled());
+                request.setTitle("Order Cancelled");
+                request.getParams().put("cancellationReason", payload.getCancellationReason() != null ? payload.getCancellationReason() : "Admin decision");
+                break;
             default:
                 return false;
         }

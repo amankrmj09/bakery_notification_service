@@ -43,6 +43,7 @@ public class BrevoTemplateProperties {
         private Long confirmation;
         private Long invoice;
         private Long delivery;
+        private Long adminCancelled;
 
         public Long getConfirmation() { return confirmation; }
         public void setConfirmation(Long confirmation) { this.confirmation = confirmation; }
@@ -50,6 +51,8 @@ public class BrevoTemplateProperties {
         public void setInvoice(Long invoice) { this.invoice = invoice; }
         public Long getDelivery() { return delivery; }
         public void setDelivery(Long delivery) { this.delivery = delivery; }
+        public Long getAdminCancelled() { return adminCancelled; }
+        public void setAdminCancelled(Long adminCancelled) { this.adminCancelled = adminCancelled; }
     }
 
     public static class PaymentProperties {
