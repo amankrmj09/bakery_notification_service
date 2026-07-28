@@ -2,7 +2,7 @@ package com.blubugtech.bakery_notification_service.strategy;
 
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.integration.brevo.BrevoTemplateProperties;
-import com.blubugtech.common.contract.messaging.UserPayload;
+import org.blubakery.bakery_common_libs.contract.messaging.UserPayload;
 import org.springframework.stereotype.Component;
 import java.util.UUID;
 

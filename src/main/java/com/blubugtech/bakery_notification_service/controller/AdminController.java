@@ -2,7 +2,7 @@ package com.blubugtech.bakery_notification_service.controller;
 
 import com.blubugtech.bakery_notification_service.service.EmailService;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
-import com.blubugtech.common.contract.feign.HealthResponse;
+import org.blubakery.bakery_common_libs.contract.feign.HealthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

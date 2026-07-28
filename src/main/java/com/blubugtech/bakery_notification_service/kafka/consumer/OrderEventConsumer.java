@@ -3,11 +3,11 @@ package com.blubugtech.bakery_notification_service.kafka.consumer;
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import com.blubugtech.bakery_notification_service.strategy.OrderNotificationBuilder;
-import com.blubugtech.common.event.OrderEvent;
-import com.blubugtech.common.contract.messaging.OrderPayload;
+import org.blubakery.bakery_common_libs.event.OrderEvent;
+import org.blubakery.bakery_common_libs.contract.messaging.OrderPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.blubugtech.common.constants.KafkaTopics;
+import org.blubakery.bakery_common_libs.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 

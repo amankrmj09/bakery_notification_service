@@ -3,11 +3,11 @@ package com.blubugtech.bakery_notification_service.kafka.consumer;
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import com.blubugtech.bakery_notification_service.strategy.UserNotificationBuilder;
-import com.blubugtech.common.event.UserEvent;
-import com.blubugtech.common.contract.messaging.UserPayload;
+import org.blubakery.bakery_common_libs.event.UserEvent;
+import org.blubakery.bakery_common_libs.contract.messaging.UserPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.blubugtech.common.constants.KafkaTopics;
+import org.blubakery.bakery_common_libs.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,7 @@ public class UserEventConsumer {
         this.notificationFactory = notificationFactory;
     }
 
-    @KafkaListener(topics = KafkaTopics.USER_EVENTS, groupId = "notification-group")
+    @KafkaListener(topics = KafkaTopics.USER_TOPIC, groupId = "notification-group")
     public void consume(UserEvent event) {
         UserPayload payload = event.getPayload();
         logger.info("Received UserEvent for User ID: {} with action: {}", payload.getUserId(), payload.getAction());
