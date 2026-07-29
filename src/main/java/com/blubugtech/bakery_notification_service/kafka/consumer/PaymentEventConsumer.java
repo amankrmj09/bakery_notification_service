@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import com.blubugtech.bakery_notification_service.strategy.PaymentNotificationBuilder;
-import org.blubakery.bakery_common_libs.event.PaymentEvent;
-import org.blubakery.bakery_common_libs.contract.messaging.PaymentPayload;
-import org.blubakery.bakery_common_libs.constants.KafkaTopics;
+import org.blubakery.common.messaging.event.PaymentEvent;
+import org.blubakery.common.messaging.contract.messaging.PaymentPayload;
+import org.blubakery.common.messaging.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 

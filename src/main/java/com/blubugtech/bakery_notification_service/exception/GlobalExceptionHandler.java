@@ -10,7 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.blubakery.bakery_common_libs.exception.handler.ErrorResponse;
+import org.blubakery.common.core.exception.handler.ErrorResponse;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.blubakery.bakery_common_libs.exception.handler.BaseExceptionHandler;
+import org.blubakery.common.core.exception.handler.BaseExceptionHandler;
 
 @RestControllerAdvice
 @Slf4j

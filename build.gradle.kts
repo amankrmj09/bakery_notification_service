@@ -14,32 +14,26 @@ java {
 }
 
 repositories {
-	mavenLocal()
-	mavenCentral()
-	maven {
-		name = "GitHubPackages"
-		url = uri("https://maven.pkg.github.com/amankrmj09/bakery-common-libs")
-		credentials {
-			username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
-			password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
-		}
-	}
+    mavenLocal()
+    mavenCentral()
 }
 
 // extra["snippetsDir"] = file("build/generated-snippets")
 extra["springCloudVersion"] = "2025.0.3"
 
 dependencies {
+    implementation("org.blubakery.libs:bakery_common_security:1.0.0")
+    implementation("org.blubakery.libs:bakery_common_messaging:1.0.0")
+    implementation("org.blubakery.libs:bakery_common_feign:1.0.0")
+    implementation("org.blubakery.libs:bakery_common_core:1.0.0")
 	implementation("org.mapstruct:mapstruct:1.5.5.Final")
 	annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 	annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 	// 1. Shared Custom Libraries
-	implementation("org.blubakery.libs:bakery_common_libs:2.5.5")
+	
 
 	// 2. Spring Boot Core & Web
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-cache")
 
 	// 3. Spring Cloud & Discovery

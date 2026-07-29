@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import com.blubugtech.bakery_notification_service.strategy.OrderNotificationBuilder;
-import org.blubakery.bakery_common_libs.event.OrderEvent;
-import org.blubakery.bakery_common_libs.contract.messaging.OrderPayload;
-import org.blubakery.bakery_common_libs.constants.KafkaTopics;
+import org.blubakery.common.messaging.event.OrderEvent;
+import org.blubakery.common.messaging.contract.messaging.OrderPayload;
+import org.blubakery.common.messaging.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
