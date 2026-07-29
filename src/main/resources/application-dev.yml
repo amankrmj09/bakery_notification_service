@@ -17,6 +17,8 @@ brevo:
   sms:
     sender: "BlusBakery"
     organisation-prefix: "BlusBakery"
+  template-id-ack: 1
+  template-id-notify: 2
 notification:
   email:
     enabled: ${EMAIL_ENABLED}
