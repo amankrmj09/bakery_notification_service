@@ -1,21 +1,19 @@
 package com.blubugtech.bakery_notification_service.integration.brevo;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.dto.email.BrevoEmailRequest;
 import com.blubugtech.bakery_notification_service.dto.email.BrevoEmailResponse;
 import com.blubugtech.bakery_notification_service.dto.email.BrevoParticipant;
 import com.blubugtech.bakery_notification_service.model.EmailMessage;
 import com.blubugtech.bakery_notification_service.model.NotificationResult;
 import com.blubugtech.bakery_notification_service.integration.email.EmailSender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@Slf4j
 public class BrevoEmailSender implements EmailSender {
-
-    private static final Logger logger = LoggerFactory.getLogger(BrevoEmailSender.class);
     
     private final BrevoEmailClient brevoEmailClient;
     private final BrevoEmailProperties brevoProperties;
@@ -27,7 +25,7 @@ public class BrevoEmailSender implements EmailSender {
 
     @Override
     public NotificationResult send(EmailMessage message) {
-        logger.info("Sending email via Brevo to: {}", message.getTo());
+        log.info("Sending email via Brevo to: {}", message.getTo());
         try {
             Long templateId = null;
             if (message.getTemplateName() != null) {
@@ -54,7 +52,7 @@ public class BrevoEmailSender implements EmailSender {
                     .messageId(response != null ? response.messageId() : null)
                     .build();
         } catch (Exception e) {
-            logger.error("Failed to send email via Brevo", e);
+            log.error("Failed to send email via Brevo", e);
             return NotificationResult.builder()
                     .success(false)
                     .errorMessage(e.getMessage())

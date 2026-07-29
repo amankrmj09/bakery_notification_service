@@ -1,9 +1,8 @@
 package com.blubugtech.bakery_notification_service.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -22,15 +21,14 @@ import java.util.Map;
 import org.blubakery.bakery_common_libs.exception.handler.BaseExceptionHandler;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends BaseExceptionHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(NotificationServiceException.class)
     public ResponseEntity<ErrorResponse> handleNotificationServiceException(
             NotificationServiceException ex, WebRequest request) {
 
-        logger.error("Notification service error: {}", ex.getMessage());
+        log.error("Notification service error: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
             "NOTIFICATION_SERVICE_ERROR",
@@ -47,7 +45,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(
             ConstraintViolationException ex, WebRequest request) {
 
-        logger.error("Constraint violation error: {}", ex.getMessage());
+        log.error("Constraint violation error: {}", ex.getMessage());
 
         Map<String, String> validationErrors = new HashMap<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
@@ -71,7 +69,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
             HttpMessageNotReadableException ex, WebRequest request) {
 
-        logger.error("HTTP message not readable: {}", ex.getMessage());
+        log.error("HTTP message not readable: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
             "MALFORMED_REQUEST",
@@ -88,7 +86,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
             MethodArgumentTypeMismatchException ex, WebRequest request) {
 
-        logger.error("Method argument type mismatch: {}", ex.getMessage());
+        log.error("Method argument type mismatch: {}", ex.getMessage());
 
         String message = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s",
                                      ex.getValue(), ex.getName(), ex.getRequiredType().getSimpleName());
@@ -108,7 +106,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
             MissingServletRequestParameterException ex, WebRequest request) {
 
-        logger.error("Missing request parameter: {}", ex.getMessage());
+        log.error("Missing request parameter: {}", ex.getMessage());
 
         String message = String.format("Missing required parameter: %s", ex.getParameterName());
 
@@ -127,7 +125,7 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(
             AccessDeniedException ex, WebRequest request) {
 
-        logger.error("Access denied: {}", ex.getMessage());
+        log.error("Access denied: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
             "ACCESS_DENIED",

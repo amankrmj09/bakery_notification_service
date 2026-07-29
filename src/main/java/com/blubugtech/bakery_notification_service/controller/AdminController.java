@@ -1,15 +1,11 @@
 package com.blubugtech.bakery_notification_service.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.service.EmailService;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
-import org.blubakery.bakery_common_libs.contract.feign.HealthResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +22,13 @@ import java.util.Map;
 @Validated
 @Tag(name = "Admin", description = "System administration and monitoring APIs")
 @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM')")
+@RequiredArgsConstructor
+@Slf4j
 public class AdminController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+    private final NotificationService notificationService;
 
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
 
     @Value("${spring.application.name:bakery-notification-service}")
     private String applicationName;
@@ -43,14 +37,13 @@ public class AdminController {
     private String serverPort;
 
 
-
     @Operation(summary = "Test email service")
     @PostMapping("/test/email")
     public ResponseEntity<Map<String, Object>> testEmailService(
             @RequestParam(required = false) String testEmail,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        logger.info("Testing email service: testEmail={}, requester={}", testEmail, requestingUserId);
+        log.info("Testing email service: testEmail={}, requester={}", testEmail, requestingUserId);
 
         try {
             boolean connectivityTest = emailService.testEmailConnection();
@@ -66,7 +59,7 @@ public class AdminController {
             return ResponseEntity.status(status).body(result);
 
         } catch (Exception e) {
-            logger.error("Email service test failed: {}", e.getMessage());
+            log.error("Email service test failed: {}", e.getMessage());
             Map<String, Object> errorResult = Map.of(
                     "service", "email",
                     "status", "ERROR",

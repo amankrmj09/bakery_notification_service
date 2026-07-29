@@ -1,12 +1,11 @@
 package com.blubugtech.bakery_notification_service.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.service.EmailService;
 import com.blubugtech.bakery_notification_service.integration.email.EmailSender;
 import com.blubugtech.bakery_notification_service.model.EmailMessage;
 import com.blubugtech.bakery_notification_service.model.NotificationResult;
 import com.blubugtech.bakery_notification_service.entity.Notification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +13,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 @Service
+@Slf4j
 public class EmailServiceImpl implements EmailService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     private final EmailSender emailSender;
     private final String ownerEmail;
@@ -44,9 +42,9 @@ public class EmailServiceImpl implements EmailService {
                 
         NotificationResult result = emailSender.send(message);
         if (result.isSuccess()) {
-            LOG.info("Auto-reply sent to {}. Message ID: {}", userEmail, result.getMessageId());
+            log.info("Auto-reply sent to {}. Message ID: {}", userEmail, result.getMessageId());
         } else {
-            LOG.error("Failed to send auto-reply to {}: {}", userEmail, result.getErrorMessage());
+            log.error("Failed to send auto-reply to {}: {}", userEmail, result.getErrorMessage());
         }
     }
 
@@ -66,9 +64,9 @@ public class EmailServiceImpl implements EmailService {
                 
         NotificationResult result = emailSender.send(message);
         if (result.isSuccess()) {
-            LOG.info("Admin notification sent for contact from {}. Message ID: {}", userName, result.getMessageId());
+            log.info("Admin notification sent for contact from {}. Message ID: {}", userName, result.getMessageId());
         } else {
-            LOG.error("Failed to send admin notification for {}: {}", userName, result.getErrorMessage());
+            log.error("Failed to send admin notification for {}: {}", userName, result.getErrorMessage());
         }
     }
 
@@ -90,10 +88,10 @@ public class EmailServiceImpl implements EmailService {
                 
         NotificationResult result = emailSender.send(message);
         if (result.isSuccess()) {
-            LOG.info("Notification email sent to {}. Message ID: {}", notification.getRecipientEmail(), result.getMessageId());
+            log.info("Notification email sent to {}. Message ID: {}", notification.getRecipientEmail(), result.getMessageId());
             notification.markAsSent(result.getMessageId());
         } else {
-            LOG.error("Failed to send notification email to {}: {}", notification.getRecipientEmail(), result.getErrorMessage());
+            log.error("Failed to send notification email to {}: {}", notification.getRecipientEmail(), result.getErrorMessage());
             notification.markAsFailed(result.getErrorMessage());
         }
     }

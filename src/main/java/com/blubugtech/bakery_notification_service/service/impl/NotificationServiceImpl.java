@@ -1,5 +1,6 @@
 package com.blubugtech.bakery_notification_service.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.dto.notification.NotificationResponse;
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.entity.Notification;
@@ -12,8 +13,6 @@ import com.blubugtech.bakery_notification_service.repository.NotificationReposit
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import com.blubugtech.bakery_notification_service.service.sender.NotificationSender;
 import com.blubugtech.bakery_notification_service.validation.NotificationValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +22,8 @@ import java.util.Set;
 
 @Service
 @Transactional
+@Slf4j
 public class NotificationServiceImpl implements NotificationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
@@ -48,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationResponse sendNotification(SendNotificationRequest request) {
-        logger.info("Sending notification: recipient={}, title={}", request.getRecipientEmail(), request.getTitle());
+        log.info("Sending notification: recipient={}, title={}", request.getRecipientEmail(), request.getTitle());
 
         if (!notificationValidator.isValid(request)) {
             throw new IllegalArgumentException("Invalid notification request");
@@ -86,7 +84,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         for (NotificationChannel channel : channels) {
             if (channel == NotificationChannel.SMS && !smsEnabled) {
-                logger.info("SMS is disabled, skipping channel");
+                log.info("SMS is disabled, skipping channel");
                 continue;
             }
 
@@ -96,7 +94,7 @@ public class NotificationServiceImpl implements NotificationService {
                     .orElse(null);
 
             if (sender == null) {
-                logger.warn("No sender found for channel: {}", channel);
+                log.warn("No sender found for channel: {}", channel);
                 errorMessages.append("No sender for ").append(channel).append("; ");
                 continue;
             }

@@ -1,20 +1,18 @@
 package com.blubugtech.bakery_notification_service.kafka.consumer;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import com.blubugtech.bakery_notification_service.strategy.PaymentNotificationBuilder;
 import org.blubakery.bakery_common_libs.event.PaymentEvent;
 import org.blubakery.bakery_common_libs.contract.messaging.PaymentPayload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.blubakery.bakery_common_libs.constants.KafkaTopics;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class PaymentEventConsumer {
-
-    private static final Logger logger = LoggerFactory.getLogger(PaymentEventConsumer.class);
 
     private final NotificationService notificationService;
     private final com.blubugtech.bakery_notification_service.strategy.NotificationFactory notificationFactory;
@@ -27,18 +25,18 @@ public class PaymentEventConsumer {
     @KafkaListener(topics = KafkaTopics.PAYMENTS_TOPIC, groupId = "notification-group")
     public void consume(PaymentEvent event) {
         PaymentPayload payload = event.getPayload();
-        logger.info("Received PaymentEvent for Payment ID: {} with status: {}", payload.getPaymentId(), payload.getStatus());
+        log.info("Received PaymentEvent for Payment ID: {} with status: {}", payload.getPaymentId(), payload.getStatus());
 
         try {
             SendNotificationRequest request = notificationFactory.buildRequest(payload);
             if (request != null && request.getTemplateId() != null) {
                 notificationService.sendNotification(request);
-                logger.info("Notification sent for payment status: {} (Payment ID: {})", payload.getStatus(), payload.getPaymentId());
+                log.info("Notification sent for payment status: {} (Payment ID: {})", payload.getStatus(), payload.getPaymentId());
             } else {
-                logger.debug("No template configured or supported for payment status: {}", payload.getStatus());
+                log.debug("No template configured or supported for payment status: {}", payload.getStatus());
             }
         } catch (Exception e) {
-            logger.error("Error processing PaymentEvent for payment: {}", payload.getPaymentId(), e);
+            log.error("Error processing PaymentEvent for payment: {}", payload.getPaymentId(), e);
         }
     }
 }

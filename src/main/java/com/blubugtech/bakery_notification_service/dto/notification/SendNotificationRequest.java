@@ -1,11 +1,18 @@
 package com.blubugtech.bakery_notification_service.dto.notification;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.UUID;
 
+@Setter
+@Getter
 public class SendNotificationRequest {
 
+    // Getters and Setters
     private UUID userId;
 
     @Email(message = "Invalid email format")
@@ -32,7 +39,8 @@ public class SendNotificationRequest {
 
     private java.util.Map<String, Object> params;
 
-    public SendNotificationRequest() {}
+    public SendNotificationRequest() {
+    }
 
     public SendNotificationRequest(String recipientEmail, String title, String content) {
         this.recipientEmail = recipientEmail;
@@ -44,28 +52,4 @@ public class SendNotificationRequest {
         return new SendNotificationRequest(recipientEmail, title, content);
     }
 
-    // Getters and Setters
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
-    public String getRecipientEmail() { return recipientEmail; }
-    public void setRecipientEmail(String recipientEmail) { this.recipientEmail = recipientEmail; }
-    public String getRecipientName() { return recipientName; }
-    public void setRecipientName(String recipientName) { this.recipientName = recipientName; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-    public Long getTemplateId() { return templateId; }
-    public void setTemplateId(Long templateId) { this.templateId = templateId; }
-    public java.util.Map<String, Object> getParams() { return params; }
-    public void setParams(java.util.Map<String, Object> params) { this.params = params; }
-    
-    public String getRecipientPhone() { return recipientPhone; }
-    public void setRecipientPhone(String recipientPhone) { this.recipientPhone = recipientPhone; }
-    public String getSmsContent() { return smsContent; }
-    public void setSmsContent(String smsContent) { this.smsContent = smsContent; }
-    public String getSmsTag() { return smsTag; }
-    public void setSmsTag(String smsTag) { this.smsTag = smsTag; }
-    public java.util.Set<com.blubugtech.bakery_notification_service.enums.NotificationChannel> getChannels() { return channels; }
-    public void setChannels(java.util.Set<com.blubugtech.bakery_notification_service.enums.NotificationChannel> channels) { this.channels = channels; }
 }

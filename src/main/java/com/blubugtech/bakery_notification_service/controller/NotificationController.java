@@ -1,17 +1,14 @@
 package com.blubugtech.bakery_notification_service.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import com.blubugtech.bakery_notification_service.dto.notification.NotificationResponse;
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.blubakery.bakery_common_libs.contract.feign.MessageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,22 +16,18 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/notifications")
 @Validated
 @Tag(name = "Notifications", description = "Notification management APIs")
+@RequiredArgsConstructor
+@Slf4j
 public class NotificationController {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationController.class);
-
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     @Operation(summary = "Send an email notification")
     @PostMapping
@@ -43,7 +36,7 @@ public class NotificationController {
             @Valid @RequestBody SendNotificationRequest request,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        logger.info("Sending email notification: recipient={}, requester={}",
+        log.info("Sending email notification: recipient={}, requester={}",
                 request.getRecipientEmail(), requestingUserId);
 
         NotificationResponse response = notificationService.sendNotification(request);
@@ -53,13 +46,13 @@ public class NotificationController {
     @Operation(summary = "Send bulk email notifications")
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or hasRole('MARKETING')")
-    public ResponseEntity<com.blubugtech.common.contract.feign.MessageResponse> sendBulkNotifications(
+    public ResponseEntity<MessageResponse> sendBulkNotifications(
             @Valid @RequestBody List<SendNotificationRequest> requests,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId) {
 
-        logger.info("Sending bulk notifications: count={}, requester={}", requests.size(), requestingUserId);
+        log.info("Sending bulk notifications: count={}, requester={}", requests.size(), requestingUserId);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new com.blubugtech.common.contract.feign.MessageResponse("Bulk notifications accepted for processing. Count: " + requests.size()));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponse("Bulk notifications accepted for processing. Count: " + requests.size()));
     }
 
     @Operation(summary = "Get notification by ID")
@@ -99,4 +92,3 @@ public class NotificationController {
     }
 
 }
-
