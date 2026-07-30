@@ -67,7 +67,7 @@ public class AdminUserNotificationBuilder extends BaseNotificationBuilder<UserPa
 
         request.getParams().put("adminName", "Admin");
         request.getParams().put("userEmail", payload.getEmail());
-        request.getParams().put("userName", payload.getName());
+        request.getParams().put("userName", payload.getFirstName() + " " + payload.getLastName());
         request.getParams().put("userId", payload.getUserId());
 
         if (payload.getAction() == null) {

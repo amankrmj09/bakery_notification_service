@@ -28,12 +28,14 @@ public class FeedbackEventConsumer {
         log.info("Received FeedbackEvent for User ID: {} of type: {}", payload.getUserId(), payload.getType());
 
         try {
-            SendNotificationRequest request = notificationFactory.buildRequest(payload);
-            if (request != null && request.getTemplateId() != null) {
-                notificationService.sendNotification(request);
-                log.info("Notification sent for feedback type: {} (User ID: {})", payload.getType(), payload.getUserId());
-            } else {
-                log.debug("No template configured or supported for feedback type: {}", payload.getType());
+            java.util.List<SendNotificationRequest> requests = notificationFactory.buildRequests(payload);
+            for (SendNotificationRequest request : requests) {
+                if (request != null && request.getTemplateId() != null) {
+                    notificationService.sendNotification(request);
+                    log.info("Notification sent for feedback type: {} (User ID: {})", payload.getType(), payload.getUserId());
+                } else {
+                    log.debug("No template configured or supported for feedback type: {}", payload.getType());
+                }
             }
         } catch (Exception e) {
             log.error("Error processing FeedbackEvent for user: {}", payload.getUserId(), e);
