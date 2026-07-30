@@ -10,6 +10,7 @@ public class BrevoTemplateProperties {
     private OrderProperties order = new OrderProperties();
     private PaymentProperties payment = new PaymentProperties();
     private FeedbackProperties feedback = new FeedbackProperties();
+    private AdminProperties admin = new AdminProperties();
 
     public AuthProperties getAuth() { return auth; }
     public void setAuth(AuthProperties auth) { this.auth = auth; }
@@ -22,6 +23,9 @@ public class BrevoTemplateProperties {
     
     public FeedbackProperties getFeedback() { return feedback; }
     public void setFeedback(FeedbackProperties feedback) { this.feedback = feedback; }
+
+    public AdminProperties getAdmin() { return admin; }
+    public void setAdmin(AdminProperties admin) { this.admin = admin; }
 
     public static class AuthProperties {
         private Long welcome;
@@ -79,5 +83,21 @@ public class BrevoTemplateProperties {
         public void setTestimonial(Long testimonial) { this.testimonial = testimonial; }
         public Long getContactUs() { return contactUs; }
         public void setContactUs(Long contactUs) { this.contactUs = contactUs; }
+    }
+
+    public static class AdminProperties {
+        private Long newOrder;
+        private Long paymentReceived;
+        private Long userCancelledOrder;
+        private Long newUserRegistration;
+
+        public Long getNewOrder() { return newOrder; }
+        public void setNewOrder(Long newOrder) { this.newOrder = newOrder; }
+        public Long getPaymentReceived() { return paymentReceived; }
+        public void setPaymentReceived(Long paymentReceived) { this.paymentReceived = paymentReceived; }
+        public Long getUserCancelledOrder() { return userCancelledOrder; }
+        public void setUserCancelledOrder(Long userCancelledOrder) { this.userCancelledOrder = userCancelledOrder; }
+        public Long getNewUserRegistration() { return newUserRegistration; }
+        public void setNewUserRegistration(Long newUserRegistration) { this.newUserRegistration = newUserRegistration; }
     }
 }
