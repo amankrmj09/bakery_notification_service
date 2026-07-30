@@ -83,6 +83,9 @@ public class AdminOrderNotificationBuilder extends BaseNotificationBuilder<Order
                 request.setTitle("New Order Received!");
                 break;
             case "CANCELLED":
+                if (Boolean.TRUE.equals(payload.getCancelledByAdmin())) {
+                    return false;
+                }
                 request.setTemplateId(props.getAdmin().getUserCancelledOrder());
                 request.setTitle("User Cancelled Order");
                 request.getParams().put("cancellationReason", payload.getCancellationReason() != null ? payload.getCancellationReason() : "User decision");
