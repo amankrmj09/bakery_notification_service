@@ -112,6 +112,7 @@ public class NotificationServiceImpl implements NotificationService {
                     errorMessages.append(channel).append(" failed: ").append(result.getErrorMessage()).append("; ");
                 }
             } catch (Exception e) {
+                log.error("Error sending notification via channel: {}", channel, e);
                 errorMessages.append(channel).append(" error: ").append(e.getMessage()).append("; ");
             }
         }

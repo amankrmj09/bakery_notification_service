@@ -58,7 +58,7 @@ public class SmsNotificationSender implements NotificationSender {
                     .messageId(response != null && response.getMessageId() != null ? response.getMessageId().toString() : null)
                     .build();
         } catch (Exception e) {
-            log.error("Failed to send SMS via Brevo: {}", e.getMessage());
+            log.error("Failed to send SMS via Brevo", e);
             return NotificationResult.builder()
                     .success(false)
                     .errorMessage(e.getMessage())

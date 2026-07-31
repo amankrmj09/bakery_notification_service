@@ -59,7 +59,7 @@ public class AdminController {
             return ResponseEntity.status(status).body(result);
 
         } catch (Exception e) {
-            log.error("Email service test failed: {}", e.getMessage());
+            log.error("Email service test failed", e);
             Map<String, Object> errorResult = Map.of(
                     "service", "email",
                     "status", "ERROR",

@@ -31,7 +31,9 @@ public class BrevoEmailSender implements EmailSender {
             if (message.getTemplateName() != null) {
                 try {
                     templateId = Long.parseLong(message.getTemplateName());
-                } catch (NumberFormatException ignored) {}
+                } catch (NumberFormatException ignored) {
+                    log.warn("Invalid template ID format: {}", message.getTemplateName(), ignored);
+                }
             }
 
             BrevoEmailRequest request = new BrevoEmailRequest(
