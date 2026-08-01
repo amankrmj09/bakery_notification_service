@@ -9,6 +9,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface NotificationMapper {
     
+    Notification toEntity(com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest request);
     
     NotificationResponse toResponse(Notification notification);
 }

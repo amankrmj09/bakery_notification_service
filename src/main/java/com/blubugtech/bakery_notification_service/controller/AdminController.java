@@ -28,7 +28,7 @@ public class AdminController {
 
     private final NotificationService notificationService;
 
-    private final EmailService emailService;
+    private final com.blubugtech.bakery_notification_service.service.EmailHealthCheck emailHealthCheck;
 
     @Value("${spring.application.name:bakery-notification-service}")
     private String applicationName;
@@ -46,14 +46,14 @@ public class AdminController {
         log.info("Testing email service: testEmail={}, requester={}", testEmail, requestingUserId);
 
         try {
-            boolean connectivityTest = emailService.testEmailConnection();
+            boolean connectivityTest = emailHealthCheck.testEmailConnection();
 
             Map<String, Object> result = new HashMap<>();
             result.put("service", "email");
             result.put("connectivity", connectivityTest);
             result.put("timestamp", LocalDateTime.now());
 
-            result.put("health", emailService.getEmailServiceHealth());
+            result.put("health", emailHealthCheck.getEmailServiceHealth());
 
             HttpStatus status = connectivityTest ? HttpStatus.OK : HttpStatus.INTERNAL_SERVER_ERROR;
             return ResponseEntity.status(status).body(result);

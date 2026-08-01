@@ -66,9 +66,10 @@ public class AdminUserNotificationBuilder extends BaseNotificationBuilder<UserPa
         }
 
         request.getParams().put("adminName", "Admin");
-        request.getParams().put("userEmail", payload.getEmail());
-        request.getParams().put("userName", payload.getFirstName() + " " + payload.getLastName());
+        request.getParams().put("customerEmail", payload.getEmail());
+        request.getParams().put("customerName", payload.getFirstName() + " " + payload.getLastName());
         request.getParams().put("userId", payload.getUserId());
+        request.getParams().put("registrationDate", payload.getTimestamp() != null ? java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(payload.getTimestamp()) : "N/A");
 
         if (payload.getAction() == null) {
             return false;
