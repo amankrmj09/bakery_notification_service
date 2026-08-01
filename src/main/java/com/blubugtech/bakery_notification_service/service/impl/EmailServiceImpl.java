@@ -33,44 +33,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendAutoReplyToUser(String userName, String userEmail) {
-        EmailMessage message = EmailMessage.builder()
-                .to(userEmail)
-                .templateName(templateIdAck)
-                .params(Map.of("name", userName))
-                .build();
-                
-        NotificationResult result = emailSender.send(message);
-        if (result.isSuccess()) {
-            log.info("Auto-reply sent to {}. Message ID: {}", userEmail, result.getMessageId());
-        } else {
-            log.error("Failed to send auto-reply to {}: {}", userEmail, result.getErrorMessage());
-        }
-    }
-
-    @Override
-    public void sendNotificationToAdmin(String userName, String userEmail, String phone, String instagramId, String messageContent) {
-        EmailMessage message = EmailMessage.builder()
-                .to(ownerEmail)
-                .templateName(templateIdNotify)
-                .params(Map.of(
-                        "name", userName,
-                        "email", userEmail,
-                        "phone", phone != null ? phone : "N/A",
-                        "instagramId", instagramId != null ? instagramId : "N/A",
-                        "message", messageContent
-                ))
-                .build();
-                
-        NotificationResult result = emailSender.send(message);
-        if (result.isSuccess()) {
-            log.info("Admin notification sent for contact from {}. Message ID: {}", userName, result.getMessageId());
-        } else {
-            log.error("Failed to send admin notification for {}: {}", userName, result.getErrorMessage());
-        }
-    }
-
-    @Override
     public void sendEmail(Notification notification, Map<String, Object> customParams) {
         Map<String, Object> params = new HashMap<>();
         if (customParams != null) {
@@ -96,13 +58,4 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    @Override
-    public boolean testEmailConnection() {
-        return true;
-    }
-
-    @Override
-    public Map<String, Object> getEmailServiceHealth() {
-        return Map.of("status", "UP", "enabled", true, "connectivity", true);
-    }
 }
