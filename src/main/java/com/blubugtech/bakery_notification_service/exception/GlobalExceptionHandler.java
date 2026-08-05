@@ -30,13 +30,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
 
         log.error("Notification service error: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            "NOTIFICATION_SERVICE_ERROR",
-            ex.getMessage(),
-            LocalDateTime.now(),
-            request.getDescription(false),
-            null
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("NOTIFICATION_SERVICE_ERROR")
+            .message(ex.getMessage())
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -54,13 +53,13 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
             validationErrors.put(fieldName, errorMessage);
         }
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            "CONSTRAINT_VIOLATION",
-            "Constraint violation in request data",
-            LocalDateTime.now(),
-            request.getDescription(false),
-            validationErrors
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("CONSTRAINT_VIOLATION")
+            .message("Constraint violation in request data")
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .validationErrors(validationErrors)
+            .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -71,13 +70,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
 
         log.error("HTTP message not readable: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            "MALFORMED_REQUEST",
-            "Malformed JSON request",
-            LocalDateTime.now(),
-            request.getDescription(false),
-            null
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("MALFORMED_REQUEST")
+            .message("Malformed JSON request")
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -91,13 +89,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
         String message = String.format("Invalid value '%s' for parameter '%s'. Expected type: %s",
                                      ex.getValue(), ex.getName(), ex.getRequiredType().getSimpleName());
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            "INVALID_PARAMETER_TYPE",
-            message,
-            LocalDateTime.now(),
-            request.getDescription(false),
-            null
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("INVALID_PARAMETER_TYPE")
+            .message(message)
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -110,13 +107,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
 
         String message = String.format("Missing required parameter: %s", ex.getParameterName());
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            "MISSING_PARAMETER",
-            message,
-            LocalDateTime.now(),
-            request.getDescription(false),
-            null
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("MISSING_PARAMETER")
+            .message(message)
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -127,13 +123,12 @@ public class GlobalExceptionHandler extends BaseExceptionHandler {
 
         log.error("Access denied: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = new ErrorResponse(
-            "ACCESS_DENIED",
-            "Access denied - insufficient permissions",
-            LocalDateTime.now(),
-            request.getDescription(false),
-            null
-        );
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("ACCESS_DENIED")
+            .message("Access denied - insufficient permissions")
+            .timestamp(LocalDateTime.now())
+            .path(request.getDescription(false))
+            .build();
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
