@@ -2,7 +2,7 @@ package com.blubugtech.bakery_notification_service.strategy;
 
 import com.blubugtech.bakery_notification_service.dto.notification.SendNotificationRequest;
 import com.blubugtech.bakery_notification_service.integration.brevo.BrevoTemplateProperties;
-import org.blubakery.common.messaging.contract.messaging.UserPayload;
+import org.blubakery.common.messaging.user.UserPayload;
 import com.blubugtech.bakery_notification_service.entity.NotificationSettings;
 import com.blubugtech.bakery_notification_service.repository.NotificationSettingsRepository;
 import org.springframework.stereotype.Component;
