@@ -5,4 +5,6 @@ import com.blubugtech.bakery_notification_service.dto.notification.NotificationR
 
 public interface NotificationService {
     NotificationResponse sendNotification(SendNotificationRequest request);
+    
+    org.springframework.data.web.PagedModel<NotificationResponse> getNotificationsByUser(java.util.UUID userId, org.springframework.data.domain.Pageable pageable);
 }

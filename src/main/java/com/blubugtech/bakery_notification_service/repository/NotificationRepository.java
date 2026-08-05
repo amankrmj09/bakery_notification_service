@@ -12,9 +12,7 @@ import java.util.UUID;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
-    List<Notification> findByUserIdOrderByCreatedAtDesc(UUID userId);
-
     Page<Notification> findByUserIdOrderByCreatedAtDesc(UUID userId, Pageable pageable);
 
-    List<Notification> findByStatusOrderByCreatedAtDesc(Notification.NotificationStatus status);
+    Page<Notification> findByStatusOrderByCreatedAtDesc(Notification.NotificationStatus status, Pageable pageable);
 }
