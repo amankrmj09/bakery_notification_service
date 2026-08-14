@@ -96,7 +96,6 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	// runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
 	// 9. Testing
