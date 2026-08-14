@@ -51,9 +51,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public org.springframework.data.web.PagedModel<NotificationResponse> getNotificationsByUser(java.util.UUID userId, org.springframework.data.domain.Pageable pageable) {
+    public org.blubakery.common.core.dto.RestPageResponse<NotificationResponse> getNotificationsByUser(java.util.UUID userId, org.springframework.data.domain.Pageable pageable) {
         org.springframework.data.domain.Page<Notification> page = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
         org.springframework.data.domain.Page<NotificationResponse> dtoPage = page.map(notificationMapper::toResponse);
-        return new org.springframework.data.web.PagedModel<>(dtoPage);
+        return new org.blubakery.common.core.dto.RestPageResponse<>(dtoPage);
     }
 }

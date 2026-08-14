@@ -10,7 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.blubakery.common.feign.contract.feign.MessageResponse;
 import org.springframework.data.domain.Page;
-import org.springframework.data.web.PagedModel;
+import org.blubakery.common.core.dto.RestPageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,7 +70,7 @@ public class NotificationController {
     @Operation(summary = "Get notifications by user")
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or (#userId.toString() == authentication.name)")
-    public ResponseEntity<PagedModel<NotificationResponse>> getNotificationsByUser(
+    public ResponseEntity<RestPageResponse<NotificationResponse>> getNotificationsByUser(
             @PathVariable UUID userId,
             @RequestHeader(value = "X-User-Id", required = false) String requestingUserId,
             @RequestParam(defaultValue = "0") int page,
@@ -81,14 +81,14 @@ public class NotificationController {
         org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.fromString(sortDir), sortBy);
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
         
-        PagedModel<NotificationResponse> notifications = notificationService.getNotificationsByUser(userId, pageable);
+        RestPageResponse<NotificationResponse> notifications = notificationService.getNotificationsByUser(userId, pageable);
         return ResponseEntity.ok(notifications);
     }
 
     @Operation(summary = "Get notifications by user with pagination")
     @GetMapping("/user/{userId}/paginated")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SYSTEM') or (#userId.toString() == authentication.name)")
-    public ResponseEntity<PagedModel<NotificationResponse>> getNotificationsByUserPaginated(
+    public ResponseEntity<RestPageResponse<NotificationResponse>> getNotificationsByUserPaginated(
             @PathVariable UUID userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -98,7 +98,7 @@ public class NotificationController {
         org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.fromString(sortDir), sortBy);
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sort);
         
-        PagedModel<NotificationResponse> notifications = notificationService.getNotificationsByUser(userId, pageable);
+        RestPageResponse<NotificationResponse> notifications = notificationService.getNotificationsByUser(userId, pageable);
         return ResponseEntity.ok(notifications);
     }
 
